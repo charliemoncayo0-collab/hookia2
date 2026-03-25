@@ -6,476 +6,945 @@
 <title>HookAI</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
-:root{--bg:#080810;--s1:#0f0f1a;--s2:#161625;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#7c5cfc;--accent2:#fc5c7d;--text:#f0eeff;--muted:rgba(240,238,255,0.45);--green:#23d18b;}
+:root{--bg:#080810;--s1:#0f0f1a;--s2:#161625;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#7c5cfc;--accent2:#fc5c7d;--accent3:#23d18b;--text:#f0eeff;--muted:rgba(240,238,255,0.45);--green:#23d18b;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(124,92,252,0.12) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(252,92,125,0.08) 0%,transparent 60%);pointer-events:none;z-index:0;}
-.wrap{max-width:800px;margin:0 auto;padding:56px 24px 100px;position:relative;z-index:1;}
-.header{text-align:center;margin-bottom:44px;}
-.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.25);border-radius:100px;padding:6px 16px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:18px;}
+.wrap{max-width:860px;margin:0 auto;padding:56px 24px 100px;position:relative;z-index:1;}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.auth-card{background:var(--s1);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:100%;max-width:440px;}
+.auth-logo{text-align:center;margin-bottom:32px;}
+.auth-logo h1{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.6) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-logo h1 em{font-style:italic;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-logo p{font-size:13px;color:var(--muted);margin-top:6px;}
+.auth-tabs{display:flex;gap:8px;margin-bottom:28px;}
+.auth-tab{flex:1;padding:10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.auth-tab.active{background:rgba(124,92,252,0.15);border-color:var(--accent);color:var(--accent);}
+.auth-field{margin-bottom:16px;}
+.auth-field label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.auth-field input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.auth-field input:focus{border-color:rgba(124,92,252,0.4);}
+.auth-field input::placeholder{color:rgba(255,255,255,0.2);}
+.btn-auth{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent) 0%,#5c3dfc 100%);color:#fff;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.3s;margin-top:8px;}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,92,252,0.3);}
+.auth-err{font-size:12px;color:var(--accent2);margin-top:12px;text-align:center;min-height:20px;}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:44px;}
+.header-left{}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.25);border-radius:100px;padding:6px 16px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
 .bdot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-h1{font-family:'Playfair Display',serif;font-size:58px;font-weight:700;line-height:1;letter-spacing:-2px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.6) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;line-height:1;letter-spacing:-2px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.6) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 h1 em{font-style:italic;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.tagline{font-size:14px;color:var(--muted);font-weight:300;margin-top:8px;}
-.keys-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.kf{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;flex-direction:column;gap:8px;transition:border-color 0.2s;}
-.kf:focus-within{border-color:rgba(124,92,252,0.4);}
-.kf label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.kf input{background:transparent;border:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;width:100%;}
-.kf input::placeholder{color:rgba(255,255,255,0.2);}
-.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:16px;}
-.ctitle{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
+.tagline{font-size:13px;color:var(--muted);margin-top:6px;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.user-badge{background:var(--s1);border:1px solid var(--border);border-radius:100px;padding:8px 16px;font-size:12px;color:var(--muted);}
+.user-badge span{color:var(--accent);font-weight:600;}
+.btn-logout{background:transparent;border:1px solid var(--border);border-radius:100px;padding:8px 16px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;}
+.btn-logout:hover{border-color:var(--accent2);color:var(--accent2);}
+.btn-reset{background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:8px 16px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;display:none;}
+.btn-reset:hover{border-color:var(--accent2);color:var(--accent2);}
+
+/* DASHBOARD */
+.dashboard{display:none;margin-bottom:32px;}
+.dashboard.show{display:block;}
+.dash-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.dash-stat{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.dash-stat .num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--accent);}
+.dash-stat .lbl{font-size:11px;color:var(--muted);margin-top:4px;}
+.dash-table{background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.dash-table table{width:100%;border-collapse:collapse;}
+.dash-table th{padding:12px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+.dash-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);}
+.dash-table tr:last-child td{border-bottom:none;}
+
+/* TABS */
+.module-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.mtab{flex:1;padding:14px;background:var(--s1);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;}
+.mtab:hover{border-color:var(--border2);}
+.mtab.active{background:rgba(124,92,252,0.1);border-color:var(--accent);color:var(--text);}
+.module{display:none;}
+.module.active{display:block;}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:28px 32px;margin-bottom:16px;}
+.ctitle{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
 .frow{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:16px;transition:border-color 0.2s;}
 .frow:focus-within{border-color:rgba(124,92,252,0.4);}
 .frow span{font-size:16px;opacity:0.5;flex-shrink:0;}
 .frow input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;}
 .frow input::placeholder{color:rgba(255,255,255,0.2);}
-.dlabel{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
-.drow{display:flex;gap:8px;margin-bottom:20px;}
-.dbtn{flex:1;padding:10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;}
-.dbtn:hover{border-color:var(--accent);color:var(--accent);}
-.dbtn.sel{background:rgba(124,92,252,0.15);border-color:var(--accent);color:var(--accent);}
-.vupload{border:1px dashed rgba(252,92,125,0.3);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;background:rgba(252,92,125,0.03);}
-.vupload:hover{border-color:rgba(252,92,125,0.6);background:rgba(252,92,125,0.06);}
-.vupload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.vupload .vi{font-size:28px;margin-bottom:8px;display:block;}
-.vupload h4{font-size:14px;font-weight:600;margin-bottom:4px;}
-.vupload p{font-size:12px;color:var(--muted);}
-.vpw{display:none;position:relative;}
-.vpw video{width:100%;max-height:200px;border-radius:8px;display:block;background:#000;}
-.vpw .vname{font-size:11px;color:var(--muted);margin-top:8px;text-align:center;}
-.vrm{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
-.btn-gen{width:100%;padding:18px;margin-top:20px;background:linear-gradient(135deg,var(--accent) 0%,#5c3dfc 100%);color:#fff;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.3s;}
-.btn-gen:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,92,252,0.3);}
-.btn-gen:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
-.loading{display:none;text-align:center;padding:48px 0;}
+
+/* VIDEO UPLOAD ZONES */
+.vzone-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.vzone{border:1px dashed rgba(255,255,255,0.15);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;background:var(--s2);}
+.vzone.hook-z{border-color:rgba(124,92,252,0.3);background:rgba(124,92,252,0.03);}
+.vzone.body-z{border-color:rgba(252,92,125,0.3);background:rgba(252,92,125,0.03);}
+.vzone.cta-z{border-color:rgba(35,209,139,0.3);background:rgba(35,209,139,0.03);}
+.vzone:hover{transform:translateY(-2px);}
+.vzone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.vzone .zi{font-size:24px;margin-bottom:6px;display:block;}
+.vzone h4{font-size:13px;font-weight:600;margin-bottom:3px;}
+.vzone p{font-size:11px;color:var(--muted);}
+.vzone .vloaded{font-size:10px;color:var(--green);margin-top:6px;display:none;}
+
+/* SECTION TOGGLE */
+.section-toggle{display:flex;gap:8px;margin-bottom:16px;}
+.stog{flex:1;padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;}
+.stog.hook-t{border-color:rgba(124,92,252,0.2);}
+.stog.body-t{border-color:rgba(252,92,125,0.2);}
+.stog.cta-t{border-color:rgba(35,209,139,0.2);}
+.stog.active.hook-t{background:rgba(124,92,252,0.15);border-color:var(--accent);color:var(--accent);}
+.stog.active.body-t{background:rgba(252,92,125,0.15);border-color:var(--accent2);color:var(--accent2);}
+.stog.active.cta-t{background:rgba(35,209,139,0.15);border-color:var(--green);color:var(--green);}
+
+.btn-analyze{width:100%;padding:16px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s;margin-bottom:8px;}
+.btn-analyze.hook-a{background:linear-gradient(135deg,var(--accent) 0%,#5c3dfc 100%);color:#fff;}
+.btn-analyze.body-a{background:linear-gradient(135deg,var(--accent2) 0%,#e8355f 100%);color:#fff;}
+.btn-analyze.cta-a{background:linear-gradient(135deg,var(--green) 0%,#1aab6d 100%);color:#fff;}
+.btn-analyze:hover{transform:translateY(-2px);}
+.btn-analyze:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:40px 0;}
 .loading.show{display:block;}
-.lring{width:48px;height:48px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+.lring{width:44px;height:44px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.ltext{font-size:14px;color:var(--muted);}
-.abox{display:none;background:rgba(124,92,252,0.06);border:1px solid rgba(124,92,252,0.2);border-radius:14px;padding:20px 24px;margin-bottom:16px;}
+.ltext{font-size:13px;color:var(--muted);}
+
+/* ANALYSIS BOX */
+.abox{display:none;border-radius:14px;padding:18px 22px;margin-bottom:16px;}
 .abox.show{display:block;}
-.atitle{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
-.atext{font-size:13px;color:var(--muted);line-height:1.8;}
+.abox.hook-a{background:rgba(124,92,252,0.06);border:1px solid rgba(124,92,252,0.2);}
+.abox.body-a{background:rgba(252,92,125,0.06);border:1px solid rgba(252,92,125,0.2);}
+.abox.cta-a{background:rgba(35,209,139,0.06);border:1px solid rgba(35,209,139,0.2);}
+.atitle{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.abox.hook-a .atitle{color:var(--accent);}
+.abox.body-a .atitle{color:var(--accent2);}
+.abox.cta-a .atitle{color:var(--green);}
+.atext{font-size:12px;color:var(--muted);line-height:1.8;}
+
+/* HOOKS */
 .hooks-wrap{display:none;margin-top:16px;}
 .hooks-wrap.show{display:block;}
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.sh h2{font-size:18px;font-weight:700;}
-.btn-regen{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sh h2{font-size:17px;font-weight:700;}
+.btn-regen{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:11px;cursor:pointer;transition:all 0.2s;}
 .btn-regen:hover{border-color:var(--border2);color:var(--text);}
-.hlist{display:flex;flex-direction:column;gap:10px;}
-.hcard{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px 22px;cursor:pointer;transition:all 0.25s;display:flex;align-items:flex-start;gap:16px;position:relative;overflow:hidden;}
-.hcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));opacity:0;transition:opacity 0.2s;}
-.hcard:hover{border-color:var(--border2);}
+.hlist{display:flex;flex-direction:column;gap:8px;}
+.hcard{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;transition:all 0.25s;display:flex;align-items:flex-start;gap:14px;position:relative;overflow:hidden;}
+.hcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;opacity:0;transition:opacity 0.2s;}
+.hcard.hook-c::before{background:linear-gradient(135deg,var(--accent),#5c3dfc);}
+.hcard.body-c::before{background:linear-gradient(135deg,var(--accent2),#e8355f);}
+.hcard.cta-c::before{background:linear-gradient(135deg,var(--green),#1aab6d);}
 .hcard:hover::before,.hcard.sel::before{opacity:1;}
-.hcard.sel{border-color:rgba(124,92,252,0.35);background:rgba(124,92,252,0.05);}
-.hcheck{width:22px;height:22px;border-radius:6px;background:rgba(124,92,252,0.15);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--accent);flex-shrink:0;margin-top:2px;}
+.hcard.sel.hook-c{border-color:rgba(124,92,252,0.35);background:rgba(124,92,252,0.05);}
+.hcard.sel.body-c{border-color:rgba(252,92,125,0.35);background:rgba(252,92,125,0.05);}
+.hcard.sel.cta-c{border-color:rgba(35,209,139,0.35);background:rgba(35,209,139,0.05);}
+.hcheck{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:2px;transition:all 0.2s;}
+.hcard.hook-c .hcheck{background:rgba(124,92,252,0.15);border:1px solid var(--accent);color:var(--accent);}
+.hcard.body-c .hcheck{background:rgba(252,92,125,0.15);border:1px solid var(--accent2);color:var(--accent2);}
+.hcard.cta-c .hcheck{background:rgba(35,209,139,0.15);border:1px solid var(--green);color:var(--green);}
 .hcard:not(.sel) .hcheck{opacity:0.2;background:var(--s2);border-color:var(--border);}
-.hidx{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--border2);flex-shrink:0;width:32px;line-height:1;}
+.hidx{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--border2);flex-shrink:0;width:30px;line-height:1;}
 .hcard.sel .hidx{color:var(--accent);}
+.hcard.sel.body-c .hidx{color:var(--accent2);}
+.hcard.sel.cta-c .hidx{color:var(--green);}
 .hbody{flex:1;}
-.hangle{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;opacity:0.8;}
-.hscript{font-size:15px;font-weight:600;line-height:1.4;margin-bottom:4px;}
-.hvoice{font-size:12px;color:rgba(252,92,125,0.8);margin-bottom:4px;font-style:italic;}
+.hangle{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;opacity:0.8;}
+.hcard.hook-c .hangle{color:var(--accent);}
+.hcard.body-c .hangle{color:var(--accent2);}
+.hcard.cta-c .hangle{color:var(--green);}
+.hscript{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:3px;}
 .hwhy{font-size:11px;color:var(--muted);line-height:1.5;}
+.hatype{display:inline-flex;align-items:center;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:100px;margin-bottom:5px;}
+.hcard.hook-c .hatype{background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.3);color:rgba(124,92,252,0.9);}
+.hcard.body-c .hatype{background:rgba(252,92,125,0.15);border:1px solid rgba(252,92,125,0.3);color:rgba(252,92,125,0.9);}
+.hcard.cta-c .hatype{background:rgba(35,209,139,0.15);border:1px solid rgba(35,209,139,0.3);color:rgba(35,209,139,0.9);}
+
+/* VIDEO SECTION */
 .vwrap{display:none;margin-top:16px;}
 .vwrap.show{display:block;}
 .vcard{background:var(--s1);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
-.vhead{padding:24px 28px 16px;border-bottom:1px solid var(--border);}
-.vhead h3{font-size:17px;font-weight:700;margin-bottom:4px;}
-.vhead p{font-size:12px;color:var(--muted);}
-.vactions{padding:20px 28px;}
-.btn-vid{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent2) 0%,#e8355f 100%);color:#fff;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;}
-.btn-vid:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(252,92,125,0.3);}
+.vhead{padding:22px 28px 16px;border-bottom:1px solid var(--border);}
+.vhead h3{font-size:16px;font-weight:700;margin-bottom:3px;}
+.vhead p{font-size:11px;color:var(--muted);}
+.vactions{padding:16px 28px;}
+.btn-vid{width:100%;padding:15px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.btn-vid.hook-v{background:linear-gradient(135deg,var(--accent) 0%,#5c3dfc 100%);color:#fff;}
+.btn-vid.body-v{background:linear-gradient(135deg,var(--accent2) 0%,#e8355f 100%);color:#fff;}
+.btn-vid.cta-v{background:linear-gradient(135deg,var(--green) 0%,#1aab6d 100%);color:#fff;}
+.btn-vid.mix-v{background:linear-gradient(135deg,#f7c948 0%,#e8355f 50%,var(--accent) 100%);color:#fff;}
+.btn-vid:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,92,252,0.25);}
 .btn-vid:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
-.player-wrap{padding:0 28px 28px;display:flex;flex-direction:column;gap:12px;}
-.vitem{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;}
-.vitem-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
-.vitem-angle{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:3px;}
-.vitem-script{font-size:13px;font-weight:600;margin-bottom:3px;}
-.vitem-voice{font-size:11px;color:rgba(252,92,125,0.8);font-style:italic;}
-.vstatus{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px;}
-.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.player-wrap{padding:0 28px 28px;display:flex;flex-direction:column;gap:10px;}
+.vitem{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
+.vitem-angle{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:3px;}
+.vitem-script{font-size:12px;font-weight:600;margin-bottom:10px;}
+.vstatus{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:6px;}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .sdot.proc{background:var(--accent);animation:pulse 1s infinite;}
 .sdot.done{background:var(--green);}
 .sdot.err{background:var(--accent2);}
-video{width:100%;border-radius:8px;background:#000;display:none;max-height:320px;object-fit:contain;margin-top:8px;}
-.btn-dl{display:none;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;margin-top:8px;background:rgba(35,209,139,0.1);border:1px solid rgba(35,209,139,0.3);border-radius:8px;color:var(--green);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+video{width:100%;border-radius:8px;background:#000;display:none;max-height:300px;object-fit:contain;margin-top:6px;}
+.btn-dl{display:none;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;margin-top:6px;background:rgba(35,209,139,0.1);border:1px solid rgba(35,209,139,0.3);border-radius:8px;color:var(--green);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s;}
 .btn-dl:hover{background:rgba(35,209,139,0.18);}
-.errmsg{display:none;padding:10px 14px;background:rgba(252,92,125,0.08);border:1px solid rgba(252,92,125,0.2);border-radius:8px;font-size:12px;color:var(--accent2);margin-top:8px;}
-.sp{width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
-.btn-reset{margin-top:16px;padding:10px 24px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:100px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;}
-.btn-reset:hover{border-color:var(--accent2);color:var(--accent2);}
+.errmsg{display:none;padding:10px;background:rgba(252,92,125,0.08);border:1px solid rgba(252,92,125,0.2);border-radius:8px;font-size:11px;color:var(--accent2);margin-top:6px;}
+.sp{width:15px;height:15px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="header">
-    <div class="badge"><div class="bdot"></div> AI Creative Studio</div>
-    <h1>Hook<em>AI</em></h1>
-    <p class="tagline">Sube tu video ganador → Claude analiza el hook → HeyGen genera 5 variaciones visuales + voz en off</p>
-    <button class="btn-reset" onclick="resetAll()" id="resetBtn" style="display:none">↺ Nueva sesión</button>
-  </div>
 
-  <div style="display:none">
-    <input type="password" id="ck">
-    <input type="password" id="hk">
-  </div>
-
-  <div class="card">
-    <div class="ctitle">Analizar hook ganador</div>
-    <div class="frow"><span>🔗</span><input type="url" id="purl" placeholder="URL del producto (contexto para Claude)"></div>
-    <div class="dlabel" style="color:var(--accent);opacity:0.7;">⏱ Duración fija: 5 segundos por hook</div>
-    <div style="height:12px;"></div>
-    <div class="dlabel">Video ganador de tu campaña</div>
-    <div class="vupload" id="vup">
-      <input type="file" accept="video/*" onchange="handleVid(event)">
-      <div id="vph"><span class="vi">🎬</span><h4>Sube el video ganador</h4><p>Claude analiza el hook visual y genera 5 variaciones con voz en off</p></div>
-      <div class="vpw" id="vpw">
-        <video id="vprev" muted playsinline></video>
-        <button class="vrm" onclick="rmVid(event)">✕</button>
-        <div class="vname" id="vname"></div>
+<!-- AUTH -->
+<div id="authScreen" style="display:none;">
+  <div style="position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(124,92,252,0.12) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(252,92,125,0.08) 0%,transparent 60%);z-index:0;"></div>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <h1>Hook<em>AI</em></h1>
+        <p>Plataforma de creación de hooks para Meta Ads</p>
       </div>
-    </div>
-    <button class="btn-gen" id="gbtn" onclick="analyze()">✦ Analizar y generar 5 variaciones</button>
-  </div>
-
-  <div class="loading" id="ld"><div class="lring"></div><div class="ltext" id="lt">Analizando tu hook ganador...</div></div>
-
-  <div class="abox" id="abox"><div class="atitle">✦ Lo que hizo funcionar este hook</div><div class="atext" id="atxt"></div></div>
-
-  <div class="hooks-wrap" id="hw">
-    <div class="sh"><h2>5 variaciones del hook</h2><button class="btn-regen" onclick="regen()">↻ Regenerar 5 nuevas</button></div>
-    <div class="hlist" id="hl"></div>
-  </div>
-
-  <div class="vwrap" id="vw">
-    <div class="vcard">
-      <div class="vhead"><h3>Generar los 5 clips</h3><p>Todos seleccionados. Haz clic en uno para deseleccionar. HeyGen generará cada variación con el estilo visual del ganador.</p></div>
-      <div class="vactions"><button class="btn-vid" id="vbtn" onclick="mkVideos()"><span>▶</span> Generar los 5 videos</button></div>
-      <div class="player-wrap" id="pw"></div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="showAuthTab('login')">Iniciar sesión</div>
+        <div class="auth-tab" onclick="showAuthTab('register')">Registrarse</div>
+      </div>
+      <div id="loginForm">
+        <div class="auth-field"><label>Usuario</label><input type="text" id="loginUser" placeholder="tu usuario"></div>
+        <div class="auth-field"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+        <button class="btn-auth" onclick="doLogin()">Entrar</button>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <div class="auth-field"><label>Nombre completo</label><input type="text" id="regName" placeholder="Tu nombre"></div>
+        <div class="auth-field"><label>Usuario</label><input type="text" id="regUser" placeholder="elige un usuario"></div>
+        <div class="auth-field"><label>Contraseña</label><input type="password" id="regPass" placeholder="••••••••"></div>
+        <button class="btn-auth" onclick="doRegister()">Crear cuenta</button>
+      </div>
+      <div class="auth-err" id="authErr"></div>
     </div>
   </div>
 </div>
 
+<!-- APP -->
+<div id="appScreen" style="display:none;">
+<div class="wrap">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="badge"><div class="bdot"></div> AI Creative Studio</div>
+      <h1>Hook<em>AI</em></h1>
+      <p class="tagline">Analiza tus videos ganadores y genera variaciones de alto impacto</p>
+    </div>
+    <div class="header-right">
+      <div class="user-badge">Hola, <span id="userName"></span></div>
+      <button class="btn-reset" id="resetBtn" onclick="resetAll()">↺ Nueva sesión</button>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD ADMIN -->
+  <div class="dashboard" id="dashboard">
+    <div class="dash-title">📊 Dashboard — Actividad del equipo</div>
+    <div class="dash-grid">
+      <div class="dash-stat"><div class="num" id="dTotal">0</div><div class="lbl">Hooks generados hoy</div></div>
+      <div class="dash-stat"><div class="num" id="dProducts">0</div><div class="lbl">Productos analizados</div></div>
+      <div class="dash-stat"><div class="num" id="dVideos">0</div><div class="lbl">Videos creados</div></div>
+    </div>
+    <div class="dash-table">
+      <table>
+        <thead><tr><th>Usuario</th><th>Producto</th><th>Módulo</th><th>Fecha</th></tr></thead>
+        <tbody id="dashTable"><tr><td colspan="4" style="color:var(--muted);text-align:center;">Sin actividad registrada</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODULE TABS -->
+  <div class="module-tabs">
+    <div class="mtab active" onclick="switchModule('analyzer')">🎬 Analizador de video ganador</div>
+    <div class="mtab" onclick="switchModule('mixer')">🔀 Mezclador de partes</div>
+  </div>
+
+  <!-- MODULE 1: ANALYZER -->
+  <div class="module active" id="module-analyzer">
+
+    <div class="card">
+      <div class="ctitle">Configuración</div>
+      <div class="frow"><span>🔗</span><input type="url" id="purl" placeholder="URL del producto (contexto para Claude)"></div>
+      <div style="font-size:11px;color:rgba(124,92,252,0.7);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">⏱ Duración fija: 5 segundos por hook</div>
+
+      <div class="ctitle" style="margin-top:4px;">Selecciona qué analizar</div>
+      <div class="section-toggle">
+        <div class="stog hook-t active" id="tog-hook" onclick="setSection('hook')">🎣 Hook</div>
+        <div class="stog body-t" id="tog-body" onclick="setSection('body')">📖 Cuerpo</div>
+        <div class="stog cta-t" id="tog-cta" onclick="setSection('cta')">🎯 CTA</div>
+      </div>
+
+      <div id="sec-hook">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Sube el video ganador — Claude analiza los primeros 5 segundos (el hook)</div>
+        <div class="vzone hook-z" id="vup-hook">
+          <input type="file" accept="video/*" onchange="handleVid(event,'hook')">
+          <div id="vph-hook"><span class="zi">🎬</span><h4>Video ganador</h4><p>Claude analiza el hook</p></div>
+          <div style="display:none;" id="vpw-hook">
+            <video id="vprev-hook" muted playsinline style="width:100%;max-height:150px;border-radius:8px;"></video>
+            <button style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:11px;" onclick="rmVid(event,'hook')">✕</button>
+            <div class="vloaded" id="vname-hook" style="display:block;"></div>
+          </div>
+        </div>
+        <button class="btn-analyze hook-a" id="gbtn-hook" onclick="analyze('hook')" style="margin-top:14px;">🎣 Analizar hook y generar 5 variaciones</button>
+      </div>
+
+      <div id="sec-body" style="display:none;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Sube el video ganador — Claude analiza el cuerpo (cómo desarrolla el problema y presenta la solución)</div>
+        <div class="vzone body-z" id="vup-body">
+          <input type="file" accept="video/*" onchange="handleVid(event,'body')">
+          <div id="vph-body"><span class="zi">📖</span><h4>Video ganador</h4><p>Claude analiza el cuerpo</p></div>
+          <div style="display:none;" id="vpw-body">
+            <video id="vprev-body" muted playsinline style="width:100%;max-height:150px;border-radius:8px;"></video>
+            <button style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:11px;" onclick="rmVid(event,'body')">✕</button>
+            <div class="vloaded" id="vname-body" style="display:block;"></div>
+          </div>
+        </div>
+        <button class="btn-analyze body-a" id="gbtn-body" onclick="analyze('body')" style="margin-top:14px;">📖 Analizar cuerpo y generar 5 variaciones</button>
+      </div>
+
+      <div id="sec-cta" style="display:none;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Sube el video ganador — Claude analiza el CTA (cómo cierra y genera la acción)</div>
+        <div class="vzone cta-z" id="vup-cta">
+          <input type="file" accept="video/*" onchange="handleVid(event,'cta')">
+          <div id="vph-cta"><span class="zi">🎯</span><h4>Video ganador</h4><p>Claude analiza el CTA</p></div>
+          <div style="display:none;" id="vpw-cta">
+            <video id="vprev-cta" muted playsinline style="width:100%;max-height:150px;border-radius:8px;"></video>
+            <button style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:11px;" onclick="rmVid(event,'cta')">✕</button>
+            <div class="vloaded" id="vname-cta" style="display:block;"></div>
+          </div>
+        </div>
+        <button class="btn-analyze cta-a" id="gbtn-cta" onclick="analyze('cta')" style="margin-top:14px;">🎯 Analizar CTA y generar 5 variaciones</button>
+      </div>
+    </div>
+
+    <div class="loading" id="ld-hook"><div class="lring" style="border-top-color:var(--accent)"></div><div class="ltext" id="lt-hook">Analizando hook...</div></div>
+    <div class="loading" id="ld-body"><div class="lring" style="border-top-color:var(--accent2)"></div><div class="ltext" id="lt-body">Analizando cuerpo...</div></div>
+    <div class="loading" id="ld-cta"><div class="lring" style="border-top-color:var(--green)"></div><div class="ltext" id="lt-cta">Analizando CTA...</div></div>
+
+    <div class="abox hook-a" id="abox-hook"><div class="atitle">✦ Análisis del hook ganador</div><div class="atext" id="atxt-hook"></div></div>
+    <div class="abox body-a" id="abox-body"><div class="atitle">✦ Análisis del cuerpo ganador</div><div class="atext" id="atxt-body"></div></div>
+    <div class="abox cta-a" id="abox-cta"><div class="atitle">✦ Análisis del CTA ganador</div><div class="atext" id="atxt-cta"></div></div>
+
+    <div class="hooks-wrap" id="hw-hook">
+      <div class="sh"><h2>5 variaciones del hook</h2><button class="btn-regen" onclick="regen('hook')">↻ Regenerar</button></div>
+      <div class="hlist" id="hl-hook"></div>
+    </div>
+    <div class="hooks-wrap" id="hw-body">
+      <div class="sh"><h2>5 variaciones del cuerpo</h2><button class="btn-regen" onclick="regen('body')">↻ Regenerar</button></div>
+      <div class="hlist" id="hl-body"></div>
+    </div>
+    <div class="hooks-wrap" id="hw-cta">
+      <div class="sh"><h2>5 variaciones del CTA</h2><button class="btn-regen" onclick="regen('cta')">↻ Regenerar</button></div>
+      <div class="hlist" id="hl-cta"></div>
+    </div>
+
+    <div class="vwrap" id="vw-hook">
+      <div class="vcard">
+        <div class="vhead"><h3>Generar videos del hook</h3><p>Todos seleccionados. Haz clic para deseleccionar.</p></div>
+        <div class="vactions"><button class="btn-vid hook-v" id="vbtn-hook" onclick="mkVideos('hook')"><span>▶</span> Generar los 5 hooks</button></div>
+        <div class="player-wrap" id="pw-hook"></div>
+      </div>
+    </div>
+    <div class="vwrap" id="vw-body">
+      <div class="vcard">
+        <div class="vhead"><h3>Generar videos del cuerpo</h3><p>Todos seleccionados. Haz clic para deseleccionar.</p></div>
+        <div class="vactions"><button class="btn-vid body-v" id="vbtn-body" onclick="mkVideos('body')"><span>▶</span> Generar los 5 cuerpos</button></div>
+        <div class="player-wrap" id="pw-body"></div>
+      </div>
+    </div>
+    <div class="vwrap" id="vw-cta">
+      <div class="vcard">
+        <div class="vhead"><h3>Generar videos del CTA</h3><p>Todos seleccionados. Haz clic para deseleccionar.</p></div>
+        <div class="vactions"><button class="btn-vid cta-v" id="vbtn-cta" onclick="mkVideos('cta')"><span>▶</span> Generar los 5 CTAs</button></div>
+        <div class="player-wrap" id="pw-cta"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 2: MIXER -->
+  <div class="module" id="module-mixer">
+    <div class="card">
+      <div class="ctitle">Sube las 3 partes ganadoras</div>
+      <div class="vzone-grid">
+        <div class="vzone hook-z" id="vup-mhook">
+          <input type="file" accept="video/*" onchange="handleMixVid(event,'mhook')">
+          <div id="vph-mhook"><span class="zi">🎣</span><h4>Hook</h4><p>Video del hook ganador</p></div>
+          <div id="vpw-mhook" style="display:none;font-size:11px;color:var(--green);">✓ Cargado</div>
+        </div>
+        <div class="vzone body-z" id="vup-mbody">
+          <input type="file" accept="video/*" onchange="handleMixVid(event,'mbody')">
+          <div id="vph-mbody"><span class="zi">📖</span><h4>Cuerpo</h4><p>Video del cuerpo ganador</p></div>
+          <div id="vpw-mbody" style="display:none;font-size:11px;color:var(--green);">✓ Cargado</div>
+        </div>
+        <div class="vzone cta-z" id="vup-mcta">
+          <input type="file" accept="video/*" onchange="handleMixVid(event,'mcta')">
+          <div id="vph-mcta"><span class="zi">🎯</span><h4>CTA</h4><p>Video del CTA ganador</p></div>
+          <div id="vpw-mcta" style="display:none;font-size:11px;color:var(--green);">✓ Cargado</div>
+        </div>
+      </div>
+      <button class="btn-analyze" style="background:linear-gradient(135deg,#f7c948 0%,#e8355f 50%,var(--accent) 100%);color:#fff;" id="gbtn-mix" onclick="analyzeMix()">🔀 Mezclar y generar 10 variaciones completas</button>
+    </div>
+
+    <div class="loading" id="ld-mix"><div class="lring" style="border-top-color:#f7c948"></div><div class="ltext" id="lt-mix">Claude está analizando las 3 partes...</div></div>
+
+    <div class="vwrap" id="vw-mix">
+      <div class="vcard">
+        <div class="vhead"><h3>10 videos completos</h3><p>Hook + Cuerpo + CTA mezclados. Todos seleccionados por defecto.</p></div>
+        <div class="vactions"><button class="btn-vid mix-v" id="vbtn-mix" onclick="mkMixVideos()"><span>▶</span> Generar los 10 videos</button></div>
+        <div class="player-wrap" id="pw-mix"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
 <script>
-let dur=4,vb64=null,hooks=[],frames=[];
+// ═══════════════════════════════
+// AUTH SYSTEM
+// ═══════════════════════════════
+const USERS = {
+  'charlie': { pass: 'admin123', role: 'admin', name: 'Charlie' },
+  'socio': { pass: 'admin123', role: 'admin', name: 'Socio' },
+  'empleada1': { pass: 'hookai2024', role: 'user', name: 'Empleada 1' },
+  'empleada2': { pass: 'hookai2024', role: 'user', name: 'Empleada 2' }
+};
 
-// Keys handled server-side via Netlify functions
+let currentUser = null;
+let activity = JSON.parse(localStorage.getItem('hookai_activity') || '[]');
 
-sd(4);
-function sd(d){dur=d;[3,4,5].forEach(n=>document.getElementById('d'+n).classList.toggle('sel',n===d));}
+function showAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
+}
 
-function handleVid(e){
-  const f=e.target.files[0];if(!f)return;
-  const url=URL.createObjectURL(f);
-  const vp=document.getElementById('vprev');
-  vp.src=url;
-  document.getElementById('vname').textContent=f.name+' · '+Math.round(f.size/1024/1024*10)/10+' MB';
-  document.getElementById('vph').style.display='none';
-  document.getElementById('vpw').style.display='block';
-  vb64='loaded'; frames=[];
-  window._vname=f.name;
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  if (USERS[u] && USERS[u].pass === p) {
+    currentUser = { username: u, ...USERS[u] };
+    localStorage.setItem('hookai_session', JSON.stringify(currentUser));
+    showApp();
+  } else {
+    document.getElementById('authErr').textContent = 'Usuario o contraseña incorrectos';
+  }
+}
 
-  // Extract 6 frames from first 5 seconds
-  vp.addEventListener('loadeddata',function ef(){
-    vp.removeEventListener('loadeddata',ef);
-    const times=[0.5,1,1.5,2.5,3.5,4.5];
-    let idx=0;
-    function nextFrame(){
-      if(idx>=times.length)return;
-      vp.currentTime=Math.min(times[idx],vp.duration*0.9);
-      vp.addEventListener('seeked',function onS(){
-        vp.removeEventListener('seeked',onS);
-        try{
-          const c=document.createElement('canvas');
-          c.width=vp.videoWidth||640;c.height=vp.videoHeight||360;
-          c.getContext('2d').drawImage(vp,0,0,c.width,c.height);
-          frames.push(c.toDataURL('image/jpeg',0.8).split(',')[1]);
-        }catch(err){}
-        idx++;nextFrame();
-      });
-    }
-    nextFrame();
+function doRegister() {
+  document.getElementById('authErr').textContent = 'El registro está deshabilitado. Contacta al administrador.';
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('hookai_session');
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'block';
+}
+
+function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('userName').textContent = currentUser.name;
+  if (currentUser.role === 'admin') {
+    document.getElementById('dashboard').classList.add('show');
+    loadDashboard();
+  }
+}
+
+function logActivity(product, module) {
+  const entry = { user: currentUser.name, product: product||'N/A', module, date: new Date().toLocaleString('es') };
+  activity.unshift(entry);
+  if (activity.length > 100) activity = activity.slice(0, 100);
+  localStorage.setItem('hookai_activity', JSON.stringify(activity));
+  if (currentUser.role === 'admin') loadDashboard();
+}
+
+function loadDashboard() {
+  const today = new Date().toLocaleDateString('es');
+  const todayAct = activity.filter(a => a.date.includes(today));
+  document.getElementById('dTotal').textContent = todayAct.length;
+  document.getElementById('dProducts').textContent = new Set(todayAct.map(a=>a.product)).size;
+  document.getElementById('dVideos').textContent = todayAct.filter(a=>a.module.includes('video')).length;
+  const tbody = document.getElementById('dashTable');
+  if (activity.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);text-align:center;">Sin actividad</td></tr>'; return; }
+  tbody.innerHTML = activity.slice(0,10).map(a=>`<tr><td>${a.user}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.product}</td><td>${a.module}</td><td style="color:var(--muted)">${a.date}</td></tr>`).join('');
+}
+
+// Check session on load
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('hookai_session');
+  if (saved) { currentUser = JSON.parse(saved); showApp(); }
+  else { document.getElementById('authScreen').style.display = 'block'; }
+});
+
+// ═══════════════════════════════
+// APP STATE
+// ═══════════════════════════════
+let frames = { hook: [], body: [], cta: [], mhook: [], mbody: [], mcta: [] };
+let loaded = { hook: false, body: false, cta: false, mhook: false, mbody: false, mcta: false };
+let hooks = { hook: [], body: [], cta: [] };
+let mixHooks = [];
+let activeSection = 'hook';
+
+function switchModule(m) {
+  document.querySelectorAll('.mtab').forEach((t,i)=>t.classList.toggle('active',(m==='analyzer'&&i===0)||(m==='mixer'&&i===1)));
+  document.querySelectorAll('.module').forEach((mod,i)=>mod.classList.toggle('active',(m==='analyzer'&&i===0)||(m==='mixer'&&i===1)));
+}
+
+function setSection(s) {
+  activeSection = s;
+  ['hook','body','cta'].forEach(t => {
+    document.getElementById('sec-'+t).style.display = t===s?'block':'none';
+    document.getElementById('tog-'+t).classList.toggle('active', t===s);
   });
 }
 
-function rmVid(e){
-  e.stopPropagation();e.preventDefault();
-  vb64=null;frames=[];
-  document.getElementById('vpw').style.display='none';
-  document.getElementById('vph').style.display='block';
-  document.getElementById('vprev').src='';
+function handleVid(e, type) {
+  const f = e.target.files[0]; if(!f) return;
+  const url = URL.createObjectURL(f);
+  const vp = document.getElementById('vprev-'+type);
+  vp.src = url;
+  document.getElementById('vname-'+type).textContent = f.name.substring(0,30)+'...';
+  document.getElementById('vph-'+type).style.display = 'none';
+  document.getElementById('vpw-'+type).style.display = 'block';
+  loaded[type] = true; frames[type] = [];
+
+  vp.addEventListener('loadeddata', function ef() {
+    vp.removeEventListener('loadeddata', ef);
+    const times = [0.5,1,1.5,2.5,3.5,4.5];
+    let idx = 0;
+    function nf() {
+      if(idx >= times.length) return;
+      vp.currentTime = Math.min(times[idx], vp.duration*0.9);
+      vp.addEventListener('seeked', function os() {
+        vp.removeEventListener('seeked', os);
+        try {
+          const c = document.createElement('canvas');
+          c.width = vp.videoWidth||640; c.height = vp.videoHeight||360;
+          c.getContext('2d').drawImage(vp,0,0,c.width,c.height);
+          frames[type].push(c.toDataURL('image/jpeg',0.8).split(',')[1]);
+        } catch(err) {}
+        idx++; nf();
+      });
+    }
+    nf();
+  });
 }
 
-async function analyze(){
-  const url=document.getElementById('purl').value.trim();
+function handleMixVid(e, type) {
+  const f = e.target.files[0]; if(!f) return;
+  const url = URL.createObjectURL(f);
+  const vp = document.createElement('video');
+  vp.src = url; vp.muted = true;
+  loaded[type] = true; frames[type] = [];
+  document.getElementById('vph-'+type).style.display = 'none';
+  document.getElementById('vpw-'+type).style.display = 'block';
+
+  vp.addEventListener('loadeddata', function ef() {
+    vp.removeEventListener('loadeddata', ef);
+    const times = [0.5,1.5,2.5,3.5];
+    let idx = 0;
+    function nf() {
+      if(idx >= times.length) return;
+      vp.currentTime = Math.min(times[idx], vp.duration*0.9);
+      vp.addEventListener('seeked', function os() {
+        vp.removeEventListener('seeked', os);
+        try {
+          const c = document.createElement('canvas');
+          c.width = vp.videoWidth||640; c.height = vp.videoHeight||360;
+          c.getContext('2d').drawImage(vp,0,0,c.width,c.height);
+          frames[type].push(c.toDataURL('image/jpeg',0.8).split(',')[1]);
+        } catch(err) {}
+        idx++; nf();
+      });
+    }
+    nf();
+  });
+}
+
+function rmVid(e, type) {
+  e.stopPropagation(); e.preventDefault();
+  loaded[type] = false; frames[type] = [];
+  document.getElementById('vpw-'+type).style.display = 'none';
+  document.getElementById('vph-'+type).style.display = 'block';
+  document.getElementById('vprev-'+type).src = '';
+}
+
+// ═══════════════════════════════
+// CLAUDE ANALYSIS
+// ═══════════════════════════════
+const SYSTEMS = {
+  hook: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Se te dan frames de los primeros 5 segundos del HOOK ganador de un video publicitario.
+
+PARTE 1 — DISECCIÓN FORENSE DEL HOOK:
+Analiza con precisión quirúrgica:
+• ¿Qué elemento visual aparece? ¿Qué problema o situación se muestra?
+• ¿Qué emoción VISCERAL despierta en el primer segundo? (asco, curiosidad extrema, dolor reconocible, urgencia)
+• ¿Cuál es el factor scroll-stopper? ¿Qué hace que el dedo se detenga?
+• ¿Close-up extremo, macro, plano general? ¿Hay movimiento?
+• ¿Qué textura, color o detalle lo hace irresistible?
+
+PARTE 2 — 5 VARIACIONES DEL HOOK (siempre 5 segundos):
+• Mantén la esencia visual que funcionó
+• Varía: ángulo de cámara, situación, iluminación
+• Audio creativo por variación: VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO
+
+Responde SOLO con JSON sin markdown:
+{"analysis":"3-4 oraciones del análisis forense","hooks":[{"id":1,"angle":"ángulo emocional","audio_type":"VOZ EN OFF","audio_content":"texto de voz o descripción de audio","why":"por qué mantiene la fórmula","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 5 SECOND VERTICAL HOOK AD:\\nVISUAL SCENE: [describe con extremo detalle qué aparece, ángulo, textura]\\nCAMERA: [tipo de plano exacto]\\nLIGHTING: [iluminación exacta]\\nMOVEMENT: [qué se mueve y cómo]\\nAUDIO: [voz en off diciendo 'X' / sonido ASMR de Y / música Z]\\nDURATION: Exactly 5 seconds\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K"}]}`,
+
+  body: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Se te dan frames del CUERPO del video ganador — la parte que desarrolla el problema y presenta la solución.
+
+PARTE 1 — DISECCIÓN DEL CUERPO GANADOR:
+• ¿Cómo desarrolla el problema del cliente?
+• ¿Cómo presenta la solución? ¿Muestra el producto en acción?
+• ¿Qué tipo de prueba social o demostración usa?
+• ¿Cuál es el ritmo y el tono emocional?
+• ¿Qué hace que la persona siga viendo después del hook?
+
+PARTE 2 — 5 VARIACIONES DEL CUERPO (5 segundos cada una):
+• Mantén la estructura narrativa que funcionó (problema→solución)
+• Varía: el ángulo del problema, la demostración del producto, el tono emocional
+• Audio creativo por variación: VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO
+
+Responde SOLO con JSON sin markdown:
+{"analysis":"3-4 oraciones del análisis del cuerpo","hooks":[{"id":1,"angle":"ángulo narrativo","audio_type":"VOZ EN OFF","audio_content":"texto o descripción de audio","why":"por qué esta variación funciona","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 5 SECOND VERTICAL BODY AD:\\nVISUAL SCENE: [describe exactamente qué aparece, producto, demostración]\\nCAMERA: [ángulo exacto]\\nLIGHTING: [iluminación]\\nMOVEMENT: [movimientos específicos]\\nAUDIO: [audio exacto]\\nDURATION: Exactly 5 seconds\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K"}]}`,
+
+  cta: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Se te dan frames del CTA del video ganador — la parte final que genera la acción de compra.
+
+PARTE 1 — DISECCIÓN DEL CTA GANADOR:
+• ¿Qué acción específica pide? (compra ahora, link en bio, desliza)
+• ¿Qué urgencia o escasez usa?
+• ¿Qué beneficio final promete?
+• ¿Cómo cierra emocionalmente? ¿Con dolor evitado o placer ganado?
+• ¿Por qué genera el clic?
+
+PARTE 2 — 5 VARIACIONES DEL CTA (5 segundos cada una):
+• Mantén el mecanismo de cierre que funcionó
+• Varía: el tipo de urgencia, el beneficio destacado, el tono
+• Audio creativo por variación: VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO
+
+Responde SOLO con JSON sin markdown:
+{"analysis":"3-4 oraciones del análisis del CTA","hooks":[{"id":1,"angle":"ángulo de cierre","audio_type":"VOZ EN OFF","audio_content":"texto o descripción de audio","why":"por qué este CTA convierte","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 5 SECOND VERTICAL CTA AD:\\nVISUAL SCENE: [describe exactamente qué aparece, producto, texto en pantalla]\\nCAMERA: [ángulo]\\nLIGHTING: [iluminación]\\nMOVEMENT: [movimiento]\\nAUDIO: [audio exacto]\\nDURATION: Exactly 5 seconds\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K"}`
+};
+
+async function analyze(type, isR=false) {
+  const url = document.getElementById('purl').value.trim();
   if(!url){alert('Pega la URL del producto');return;}
-  if(!vb64){alert('Sube el video ganador');return;}
-  await callClaude(url);
-}
+  if(!loaded[type]){alert('Sube el video primero');return;}
 
-async function regen(){
-  const url=document.getElementById('purl').value.trim();
-  if(!url||!vb64)return;
-  document.getElementById('vw').classList.remove('show');
-  await callClaude(url,true);
-}
+  document.getElementById('gbtn-'+type).disabled = true;
+  document.getElementById('hw-'+type).classList.remove('show');
+  document.getElementById('abox-'+type).classList.remove('show');
+  document.getElementById('vw-'+type).classList.remove('show');
+  document.getElementById('ld-'+type).classList.add('show');
 
-async function callClaude(url,isR=false){
-  document.getElementById('gbtn').disabled=true;
-  document.getElementById('hw').classList.remove('show');
-  document.getElementById('abox').classList.remove('show');
-  document.getElementById('ld').classList.add('show');
-
-  const msgs=['Analizando los frames del hook ganador...','Claude está entendiendo qué lo hizo funcionar...','Identificando el estilo visual y emocional...','Creando 5 variaciones basadas en la fórmula ganadora...','Generando los prompts para HeyGen...'];
-  let mi=0;
+  const msgs = {
+    hook: ['Analizando frames del hook...','Identificando el scroll-stopper...','Creando variaciones del hook...'],
+    body: ['Analizando el cuerpo del video...','Entendiendo la narrativa ganadora...','Generando variaciones del cuerpo...'],
+    cta: ['Analizando el CTA...','Identificando el mecanismo de cierre...','Generando variaciones del CTA...']
+  };
+  let mi=0; const msgArr=msgs[type];
   const iv=setInterval(()=>{
-    mi=(mi+1)%msgs.length;
-    const el=document.getElementById('lt');
+    mi=(mi+1)%msgArr.length;
+    const el=document.getElementById('lt-'+type);
     el.style.opacity=0;
-    setTimeout(()=>{el.textContent=msgs[mi];el.style.opacity=1;},200);
+    setTimeout(()=>{el.textContent=msgArr[mi];el.style.opacity=1;},200);
   },2500);
 
-  const sys=`Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Llevas 20 años analizando qué hace que un hook de video PARE el scroll en el primer segundo y genere ventas reales.
-
-Se te dan frames de los primeros 5 segundos del hook GANADOR — el video que mejor CPA y ventas tuvo en campaña. Tu trabajo tiene DOS partes:
-
-═══════════════════════════════
-PARTE 1 — DISECCIÓN FORENSE DEL HOOK GANADOR
-═══════════════════════════════
-Analiza con precisión quirúrgica qué ves:
-• ¿Qué elemento visual aparece? (parte del cuerpo, producto, situación, problema visible)
-• ¿Qué emoción VISCERAL despierta en el primer segundo? (asco, curiosidad extrema, dolor reconocible, alivio, urgencia)
-• ¿Cuál es el "factor scroll-stopper"? ¿Qué hace que el dedo se detenga?
-• ¿Es close-up extremo, macro, plano general? ¿Hay movimiento o es estático?
-• ¿Qué textura, color o detalle hace que sea irresistible mirar?
-• ¿Por qué ESTE visual específico conecta con el dolor del cliente?
-
-═══════════════════════════════
-PARTE 2 — 5 VARIACIONES CREATIVAS (siempre 5 segundos)
-═══════════════════════════════
-Basándote en la FÓRMULA GANADORA, crea 5 variaciones. Cada una debe:
-
-1. MANTENER la esencia visual que funcionó (mismo tipo de escena, mismo problema, mismo universo visual)
-2. VARIAR creativamente: ángulo de cámara diferente, situación ligeramente diferente, iluminación distinta, momento diferente del problema
-3. Tener AUDIO CREATIVO — no siempre voz en off. Decide para cada variación qué audio es más poderoso:
-   • VOZ EN OFF: cuando el gancho necesita narración emocional
-   • ASMR / sonido ambiente: cuando el visual es tan potente que el sonido lo amplifica (raspado, crujido, goteo, textura)
-   • MÚSICA + texto en pantalla: cuando necesita energía o urgencia sin palabras
-   • SILENCIO total + texto: cuando el impacto es puramente visual y perturbador
-
-REGLAS DE ORO:
-• Los 5 hooks deben ser DISTINTOS entre sí pero reconociblemente de la misma "familia" que el ganador
-• Cada prompt para HeyGen debe ser TAN DETALLADO que HeyGen no tenga que adivinar nada
-• Duración EXACTA: 5 segundos siempre
-• Si el ganador no muestra caras, las variaciones tampoco
-• Si el ganador es close-up de un problema físico, las variaciones son close-up del mismo tipo de problema
-
-${isR?'⚠️ REGENERACIÓN: Estas 5 variaciones deben ser COMPLETAMENTE DIFERENTES a las anteriores. Explora nuevos ángulos, nuevas situaciones, nuevos tipos de audio. Pero siempre fiel a la fórmula ganadora.':''}
-
-Responde SOLO con este JSON exacto, sin markdown, sin texto extra:
-{
-  "analysis": "Disección del hook ganador en 3-4 oraciones. Qué aparece, qué emoción dispara, cuál es el factor scroll-stopper y por qué conecta con el dolor del cliente.",
-  "hooks": [
-    {
-      "id": 1,
-      "angle": "nombre corto del ángulo emocional (ej: Asco + curiosidad, Dolor reconocible, Alivio inmediato)",
-      "audio_type": "VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO",
-      "audio_content": "Si es voz en off: el texto exacto que se dice (máx 15 palabras, coloquial latinoamericano, que PARA el scroll). Si es ASMR: descripción del sonido específico. Si es música: tipo de música y emoción. Si es silencio: texto en pantalla.",
-      "why": "una línea explicando por qué esta variación mantiene la fórmula ganadora",
-      "heygen_prompt": "MASTER PROMPT FOR HEYGEN VIDEO AGENT — 5 SECOND VERTICAL AD HOOK:\n\nVISUAL SCENE: [Describe with extreme detail exactly what appears on screen. What object/body part/product/situation. Be surgical — not 'an ear' but 'extreme close-up of a human ear canal with visible dark earwax buildup, slightly wet, skin texture visible, a thin stainless steel ear pick slowly entering from the right side of frame']\n\nCAMERA: [Exact shot type: extreme close-up / macro / overhead / dutch angle / slow push-in / static]\n\nLIGHTING: [Exact lighting: harsh clinical white light / warm soft side light / dramatic single source / ASMR-style diffused soft light]\n\nMOVEMENT: [Exactly what moves and how: slow deliberate hand movement from right to left / slight camera push-in / complete stillness / micro-tremor of hand]\n\nTEXTURE & DETAIL: [What textures should be hyperrealistic: skin pores, hair follicles, product surface, liquid consistency]\n\nCOLOR PALETTE: [Dominant colors and mood: clinical whites and skin tones / dark saturated problem colors / high contrast]\n\nAUDIO: [Exact audio instruction: voiceover saying \'[exact words]\' in a [tone: urgent/whispered/alarmed/empathetic] Latin American Spanish accent / ASMR sound of [specific sound] / [music genre] background with text overlay showing \'[text]\']\n\nDURATION: Exactly 5 seconds\nFORMAT: Vertical 9:16, 1080x1920\nSTYLE: Hyper-realistic commercial ad, 4K quality, no watermarks\nMOOD: [The emotional gut-punch this 5 seconds should deliver]"
-    }
-  ]
-}`;
-
   const content=[];
+  const frs=frames[type].slice(0,4);
+  frs.forEach((f,i)=>{
+    content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:f}});
+    content.push({type:'text',text:`Frame ${i+1} del ${type}`});
+  });
+  content.push({type:'text',text:`URL del producto: ${url}\n${isR?'Genera 5 variaciones COMPLETAMENTE DIFERENTES a las anteriores.':''}`});
 
-  if(frames.length>0){
-    // Send up to 4 frames (API limit consideration)
-    const framesToSend=frames.slice(0,4);
-    framesToSend.forEach((f,i)=>{
-      content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:f}});
-      content.push({type:'text',text:`Frame ${i+1} del hook (segundo ${[0.5,1,1.5,2.5][i]})`});
-    });
-    content.push({type:'text',text:`\nURL del producto: ${url}\nArchivo: ${window._vname||'video'}\nDuración de hooks a generar: 5 segundos\n\nAnaliza estos frames del hook ganador y genera el análisis + 5 variaciones.`});
-  } else {
-    content.push({type:'text',text:`URL del producto: ${url}\nDuración: ${dur} segundos\n\nNo se pudieron extraer frames del video. Genera 5 hooks de alta conversión para este tipo de producto basándote en las mejores prácticas de Meta Ads.`});
-  }
-
-  try{
+  try {
     const res=await fetch('/api/claude',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        
-        
-        
-      },
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:sys,messages:[{role:'user',content}]})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:SYSTEMS[type],messages:[{role:'user',content}]})
     });
     clearInterval(iv);
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`HTTP ${res.status}`);}
     const d=await res.json();
     const raw=d.content[0].text.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(raw);
-    hooks=parsed.hooks;
-
-    document.getElementById('ld').classList.remove('show');
-    document.getElementById('atxt').textContent=parsed.analysis;
-    document.getElementById('abox').classList.add('show');
-    renderHooks();
-    document.getElementById('gbtn').disabled=false;
-  }catch(e){
+    hooks[type]=parsed.hooks;
+    document.getElementById('ld-'+type).classList.remove('show');
+    document.getElementById('atxt-'+type).textContent=parsed.analysis;
+    document.getElementById('abox-'+type).classList.add('show');
+    renderHooks(type);
+    document.getElementById('gbtn-'+type).disabled=false;
+    document.getElementById('resetBtn').style.display='inline-block';
+    logActivity(url, `Análisis ${type}`);
+  } catch(e) {
     clearInterval(iv);
-    document.getElementById('ld').classList.remove('show');
-    document.getElementById('gbtn').disabled=false;
+    document.getElementById('ld-'+type).classList.remove('show');
+    document.getElementById('gbtn-'+type).disabled=false;
     alert('Error: '+e.message);
   }
 }
 
-function renderHooks(){
-  const l=document.getElementById('hl');
+function regen(type) {
+  document.getElementById('vw-'+type).classList.remove('show');
+  analyze(type, true);
+}
+
+function renderHooks(type) {
+  const l=document.getElementById('hl-'+type);
   l.innerHTML='';
-  hooks.forEach((h,i)=>{
+  hooks[type].forEach((h,i)=>{
     const d=document.createElement('div');
-    d.className='hcard sel';d.id='hc'+h.id;
-    d.onclick=()=>toggleH(h.id);
+    d.className=`hcard ${type}-c sel`;d.id=`hc-${type}-${h.id}`;
+    d.onclick=()=>toggleH(type,h.id);
     d.innerHTML=`
       <div class="hcheck">✓</div>
       <div class="hidx">${String(i+1).padStart(2,'0')}</div>
       <div class="hbody">
         <div class="hangle">${h.angle}</div>
-        <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;background:rgba(252,92,125,0.15);border:1px solid rgba(252,92,125,0.3);color:rgba(252,92,125,0.9);padding:2px 8px;border-radius:100px;">${h.audio_type||'VOZ EN OFF'}</span>
-        </div>
-        <div class="hscript">"${h.audio_content||h.voiceover||''}"</div>
+        <div class="hatype">${h.audio_type||'VOZ EN OFF'}</div>
+        <div class="hscript">"${h.audio_content||''}"</div>
         <div class="hwhy">${h.why}</div>
       </div>`;
     l.appendChild(d);
   });
-  document.getElementById('hw').classList.add('show');
-  document.getElementById('vw').classList.add('show');
-  document.getElementById('pw').innerHTML='';
+  document.getElementById('hw-'+type).classList.add('show');
+  document.getElementById('vw-'+type).classList.add('show');
+  document.getElementById('pw-'+type).innerHTML='';
 }
 
-function toggleH(id){document.getElementById('hc'+id).classList.toggle('sel');}
+function toggleH(type,id){document.getElementById(`hc-${type}-${id}`).classList.toggle('sel');}
 
-async function mkVideos(){
-  const hk='proxy';
-  const sel=hooks.filter(h=>document.getElementById('hc'+h.id).classList.contains('sel'));
+// ═══════════════════════════════
+// VIDEO GENERATION
+// ═══════════════════════════════
+async function mkVideos(type) {
+  const sel=hooks[type].filter(h=>document.getElementById(`hc-${type}-${h.id}`).classList.contains('sel'));
   if(!sel.length){alert('Selecciona al menos un hook');return;}
-
-  document.getElementById('vbtn').disabled=true;
-  document.getElementById('vbtn').innerHTML=`<div class="sp"></div> Enviando ${sel.length} videos a HeyGen...`;
-
-  const pw=document.getElementById('pw');
+  document.getElementById('vbtn-'+type).disabled=true;
+  document.getElementById('vbtn-'+type).innerHTML=`<div class="sp"></div> Enviando ${sel.length} videos...`;
+  const pw=document.getElementById('pw-'+type);
   pw.innerHTML='';
-
   sel.forEach(h=>{
     const div=document.createElement('div');
-    div.className='vitem';div.id='vi'+h.id;
-    div.innerHTML=`
-      <div class="vitem-top">
-        <div>
-          <div class="vitem-angle">${h.angle} · <span style="font-size:9px;opacity:0.7;">${h.audio_type||'VOZ EN OFF'}</span></div>
-          <div class="vitem-script">"${h.audio_content||h.voiceover||''}"</div>
-        </div>
-      </div>
-      <div class="vstatus" id="vs${h.id}"><div class="sdot proc"></div><span id="st${h.id}">Enviando a HeyGen...</span></div>
-      <video id="vp${h.id}" controls></video>
-      <a id="dl${h.id}" class="btn-dl" download="hook_${h.id}.mp4">↓ Descargar variación ${h.id}</a>
-      <div class="errmsg" id="er${h.id}"></div>`;
+    div.className='vitem';div.id=`vi-${type}-${h.id}`;
+    div.innerHTML=`<div class="vitem-angle">${h.angle} · ${h.audio_type||''}</div><div class="vitem-script">"${h.audio_content||''}"</div><div class="vstatus" id="vs-${type}-${h.id}"><div class="sdot proc"></div><span id="st-${type}-${h.id}">Enviando...</span></div><video id="vp-${type}-${h.id}" controls></video><a id="dl-${type}-${h.id}" class="btn-dl" download="variacion_${type}_${h.id}.mp4">↓ Descargar</a><div class="errmsg" id="er-${type}-${h.id}"></div>`;
     pw.appendChild(div);
   });
-
-  document.getElementById('vw').scrollIntoView({behavior:'smooth',block:'nearest'});
-  document.getElementById('resetBtn').style.display='inline-block';
-  await Promise.all(sel.map(h=>sendHeyGen(h,hk)));
-  document.getElementById('vbtn').disabled=false;
-  document.getElementById('vbtn').innerHTML='<span>▶</span> Regenerar videos';
+  document.getElementById('vw-'+type).scrollIntoView({behavior:'smooth',block:'nearest'});
+  await Promise.all(sel.map(h=>sendHeyGen(h.heygen_prompt,`${type}-${h.id}`)));
+  document.getElementById('vbtn-'+type).disabled=false;
+  document.getElementById('vbtn-'+type).innerHTML='<span>▶</span> Regenerar videos';
+  logActivity(document.getElementById('purl').value, `Videos ${type}`);
 }
 
-async function sendHeyGen(h,hk){
-  try{
-    const finalPrompt = h.heygen_prompt || '';
-    const r=await fetch('/api/heygen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:'/v1/video_agent/generate',body:{prompt:finalPrompt}})});
+async function sendHeyGen(prompt, key) {
+  try {
+    const r=await fetch('/api/heygen',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({endpoint:'/v1/video_agent/generate',body:{prompt}})
+    });
     const d=await r.json();
     if(!r.ok)throw new Error(d.message||`HTTP ${r.status}`);
     const vid=d.data?.video_id||d.video_id;
     if(!vid)throw new Error('No video_id');
-    document.getElementById('st'+h.id).textContent='Renderizando...';
-    await pollVid(vid,hk,h.id);
+    document.getElementById('st-'+key).textContent='Renderizando...';
+    await pollVid(vid,key);
   }catch(e){
-    document.querySelector(`#vs${h.id} .sdot`).className='sdot err';
-    document.getElementById('st'+h.id).textContent='Error: '+e.message;
-    document.getElementById('er'+h.id).textContent='✗ '+e.message;
-    document.getElementById('er'+h.id).style.display='block';
+    document.querySelector(`#vs-${key} .sdot`).className='sdot err';
+    document.getElementById('st-'+key).textContent='Error: '+e.message;
+    document.getElementById('er-'+key).textContent='✗ '+e.message;
+    document.getElementById('er-'+key).style.display='block';
   }
 }
 
-function resetAll(){
-  if(!confirm('¿Limpiar toda la sesión y empezar de nuevo?'))return;
-  vb64=null;hooks=[];frames=[];
-  document.getElementById('vprev').src='';
-  document.getElementById('vpw').style.display='none';
-  document.getElementById('vph').style.display='block';
-  document.getElementById('vname').textContent='';
-  document.getElementById('purl').value='';
-  document.getElementById('hw').classList.remove('show');
-  document.getElementById('abox').classList.remove('show');
-  document.getElementById('vw').classList.remove('show');
-  document.getElementById('pw').innerHTML='';
-  document.getElementById('ld').classList.remove('show');
-  document.getElementById('gbtn').disabled=false;
-  document.getElementById('vbtn').innerHTML='<span>▶</span> Generar los 5 videos';
-  document.getElementById('resetBtn').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function pollVid(vid,hk,hid){
+function pollVid(vid,key){
   return new Promise(resolve=>{
     let att=0;
     const iv=setInterval(async()=>{
       att++;
-      if(att>72){clearInterval(iv);document.getElementById('st'+hid).textContent='Ve a app.heygen.com/videos';resolve();return;}
+      if(att>72){clearInterval(iv);document.getElementById('st-'+key).textContent='Ve a app.heygen.com/videos';resolve();return;}
       try{
         const r=await fetch('/api/heygen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:`/v1/video_status.get?video_id=${vid}`,method:'GET'})});
         const d=await r.json();
         const st=d.data?.status,vu=d.data?.video_url;
-        document.getElementById('st'+hid).textContent=
-          st==='processing'?`Renderizando... (${att*10}s)`:
-          st==='completed'?'✓ Listo':st||'Procesando...';
+        document.getElementById('st-'+key).textContent=st==='processing'?`Renderizando... (${att*10}s)`:st==='completed'?'✓ Listo':st||'Procesando...';
         if(st==='completed'&&vu){
           clearInterval(iv);
-          document.querySelector(`#vs${hid} .sdot`).className='sdot done';
-          const p=document.getElementById('vp'+hid);
+          document.querySelector(`#vs-${key} .sdot`).className='sdot done';
+          const p=document.getElementById('vp-'+key);
           p.src=vu;p.style.display='block';p.play().catch(()=>{});
-          const dl=document.getElementById('dl'+hid);
+          const dl=document.getElementById('dl-'+key);
           dl.href=vu;
-          dl.setAttribute('download','hook_variacion_'+hid+'.mp4');
-          dl.onclick=function(e){
-            e.preventDefault();
-            e.stopPropagation();
-            fetch(vu).then(r=>r.blob()).then(b=>{
-              const a=document.createElement('a');
-              a.href=URL.createObjectURL(b);
-              a.download='hook_variacion_'+hid+'.mp4';
-              a.click();
-            }).catch(()=>{window.open(vu,'_blank');});
-          };
+          dl.onclick=function(e){e.preventDefault();fetch(vu).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${key}.mp4`;a.click();}).catch(()=>window.open(vu,'_blank'));};
           dl.style.display='flex';
           resolve();
         }else if(st==='failed'){
           clearInterval(iv);
-          document.querySelector(`#vs${hid} .sdot`).className='sdot err';
-          document.getElementById('st'+hid).textContent='Error en HeyGen';
+          document.querySelector(`#vs-${key} .sdot`).className='sdot err';
+          document.getElementById('st-'+key).textContent='Error en HeyGen';
           resolve();
         }
       }catch(e){}
     },10000);
   });
+}
+
+// ═══════════════════════════════
+// MIXER MODULE
+// ═══════════════════════════════
+async function analyzeMix() {
+  if(!loaded.mhook||!loaded.mbody||!loaded.mcta){alert('Sube los 3 videos primero');return;}
+  document.getElementById('gbtn-mix').disabled=true;
+  document.getElementById('vw-mix').classList.remove('show');
+  document.getElementById('ld-mix').classList.add('show');
+
+  const msgs=['Claude analiza las 3 partes...','Identificando fórmulas ganadoras...','Creando combinaciones explosivas...','Generando 10 variaciones completas...'];
+  let mi=0;
+  const iv=setInterval(()=>{mi=(mi+1)%msgs.length;document.getElementById('lt-mix').textContent=msgs[mi];},2500);
+
+  const sys=`Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica.
+
+Se te dan frames de 3 partes de videos ganadores:
+- HOOK: los primeros frames (el gancho que para el scroll)
+- CUERPO: los frames del medio (desarrollo del problema y solución)  
+- CTA: los frames finales (el cierre que genera la acción)
+
+Tu misión: analizar cada parte y crear 10 combinaciones creativas mezclando elementos de las 3 partes. Cada combinación es un video completo (hook+cuerpo+cta) con variaciones en el guión, tono y estilo visual.
+
+Responde SOLO con JSON sin markdown:
+{"mixes":[{"id":1,"title":"nombre creativo de la combinación","hook_angle":"ángulo del hook","body_angle":"ángulo del cuerpo","cta_angle":"ángulo del CTA","voiceover":"guión completo del video (hook+cuerpo+cta, 15 segundos total, coloquial latinoamericano)","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 15 SECOND COMPLETE VERTICAL AD:\\nHOOK (0-5s): [describe exactamente qué aparece en los primeros 5 segundos]\\nBODY (5-10s): [describe exactamente qué aparece en los segundos 5-10]\\nCTA (10-15s): [describe exactamente qué aparece en los últimos 5 segundos]\\nCAMERA: [ángulos para cada parte]\\nAUDIO: [voz en off diciendo: 'guión completo aquí']\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K ad"}]}`;
+
+  const content=[];
+  content.push({type:'text',text:'HOOK — primeros frames:'});
+  frames.mhook.slice(0,2).forEach(f=>content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:f}}));
+  content.push({type:'text',text:'CUERPO — frames del medio:'});
+  frames.mbody.slice(0,2).forEach(f=>content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:f}}));
+  content.push({type:'text',text:'CTA — frames finales:'});
+  frames.mcta.slice(0,2).forEach(f=>content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:f}}));
+  content.push({type:'text',text:'Genera 10 combinaciones completas mezclando creativamente estas 3 partes.'});
+
+  try {
+    const res=await fetch('/api/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content}]})
+    });
+    clearInterval(iv);
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`HTTP ${res.status}`);}
+    const d=await res.json();
+    const raw=d.content[0].text.replace(/```json|```/g,'').trim();
+    mixHooks=JSON.parse(raw).mixes;
+    document.getElementById('ld-mix').classList.remove('show');
+    renderMix();
+    document.getElementById('gbtn-mix').disabled=false;
+  }catch(e){
+    clearInterval(iv);
+    document.getElementById('ld-mix').classList.remove('show');
+    document.getElementById('gbtn-mix').disabled=false;
+    alert('Error: '+e.message);
+  }
+}
+
+function renderMix(){
+  const pw=document.getElementById('pw-mix');
+  pw.innerHTML='';
+  mixHooks.forEach((h,i)=>{
+    const div=document.createElement('div');
+    div.className='vitem';div.id='mvi-'+h.id;
+    div.innerHTML=`<div class="vitem-angle">Combinación ${String(i+1).padStart(2,'0')} · ${h.title}</div><div class="vitem-script">"${h.voiceover}"</div><div style="font-size:10px;color:var(--muted);margin-bottom:8px;">Hook: ${h.hook_angle} · Cuerpo: ${h.body_angle} · CTA: ${h.cta_angle}</div>`;
+    pw.appendChild(div);
+  });
+  document.getElementById('vw-mix').classList.add('show');
+}
+
+async function mkMixVideos(){
+  document.getElementById('vbtn-mix').disabled=true;
+  document.getElementById('vbtn-mix').innerHTML='<div class="sp"></div> Enviando 10 videos...';
+  const pw=document.getElementById('pw-mix');
+  pw.innerHTML='';
+  mixHooks.forEach(h=>{
+    const div=document.createElement('div');
+    div.className='vitem';div.id='mvi-'+h.id;
+    div.innerHTML=`<div class="vitem-angle">Combinación ${h.id} · ${h.title}</div><div class="vitem-script">"${h.voiceover}"</div><div class="vstatus" id="mvs-${h.id}"><div class="sdot proc"></div><span id="mst-${h.id}">Enviando...</span></div><video id="mvp-${h.id}" controls></video><a id="mdl-${h.id}" class="btn-dl" download="mix_${h.id}.mp4">↓ Descargar mix ${h.id}</a><div class="errmsg" id="mer-${h.id}"></div>`;
+    pw.appendChild(div);
+  });
+  document.getElementById('vw-mix').scrollIntoView({behavior:'smooth',block:'nearest'});
+  await Promise.all(mixHooks.map(h=>sendMixHeyGen(h)));
+  document.getElementById('vbtn-mix').disabled=false;
+  document.getElementById('vbtn-mix').innerHTML='<span>▶</span> Regenerar';
+}
+
+async function sendMixHeyGen(h){
+  try{
+    const r=await fetch('/api/heygen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:'/v1/video_agent/generate',body:{prompt:h.heygen_prompt}})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.message||`HTTP ${r.status}`);
+    const vid=d.data?.video_id||d.video_id;
+    if(!vid)throw new Error('No video_id');
+    document.getElementById('mst-'+h.id).textContent='Renderizando...';
+    await pollMixVid(vid,h.id);
+  }catch(e){
+    document.querySelector(`#mvs-${h.id} .sdot`).className='sdot err';
+    document.getElementById('mst-'+h.id).textContent='Error: '+e.message;
+    document.getElementById('mer-'+h.id).textContent='✗ '+e.message;
+    document.getElementById('mer-'+h.id).style.display='block';
+  }
+}
+
+function pollMixVid(vid,hid){
+  return new Promise(resolve=>{
+    let att=0;
+    const iv=setInterval(async()=>{
+      att++;
+      if(att>90){clearInterval(iv);resolve();return;}
+      try{
+        const r=await fetch('/api/heygen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:`/v1/video_status.get?video_id=${vid}`,method:'GET'})});
+        const d=await r.json();
+        const st=d.data?.status,vu=d.data?.video_url;
+        document.getElementById('mst-'+hid).textContent=st==='processing'?`Renderizando... (${att*10}s)`:st==='completed'?'✓ Listo':st||'Procesando...';
+        if(st==='completed'&&vu){
+          clearInterval(iv);
+          document.querySelector(`#mvs-${hid} .sdot`).className='sdot done';
+          const p=document.getElementById('mvp-'+hid);
+          p.src=vu;p.style.display='block';p.play().catch(()=>{});
+          const dl=document.getElementById('mdl-'+hid);
+          dl.href=vu;dl.onclick=function(e){e.preventDefault();fetch(vu).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`mix_${hid}.mp4`;a.click();}).catch(()=>window.open(vu,'_blank'));};
+          dl.style.display='flex';
+          resolve();
+        }else if(st==='failed'){clearInterval(iv);resolve();}
+      }catch(e){}
+    },10000);
+  });
+}
+
+function resetAll(){
+  if(!confirm('¿Limpiar toda la sesión?'))return;
+  ['hook','body','cta'].forEach(t=>{
+    loaded[t]=false;frames[t]=[];hooks[t]=[];
+    document.getElementById('vph-'+t).style.display='block';
+    document.getElementById('vpw-'+t).style.display='none';
+    document.getElementById('vprev-'+t).src='';
+    document.getElementById('hw-'+t).classList.remove('show');
+    document.getElementById('abox-'+t).classList.remove('show');
+    document.getElementById('vw-'+t).classList.remove('show');
+    document.getElementById('pw-'+t).innerHTML='';
+    document.getElementById('gbtn-'+t).disabled=false;
+  });
+  document.getElementById('purl').value='';
+  document.getElementById('resetBtn').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
 </body>
