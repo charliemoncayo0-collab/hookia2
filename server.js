@@ -63,3 +63,36 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`HookAI running on port ${PORT}`));
+
+// FAL.AI proxy
+app.post('/api/fal', async (req, res) => {
+  try {
+    const { endpoint, body } = req.body;
+    const result = await makeRequest(
+      'fal.run',
+      endpoint || '/fal-ai/kling-video/v2.1/standard/text-to-video',
+      'POST',
+      { 'Authorization': `Key ${process.env.FAL_KEY || ''}`, 'Content-Type': 'application/json' },
+      body
+    );
+    res.status(result.status).json(JSON.parse(result.body));
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// FAL status check
+app.post('/api/fal-status', async (req, res) => {
+  try {
+    const { request_id, endpoint } = req.body;
+    const path = `/${endpoint}/requests/${request_id}`;
+    const result = await makeRequest(
+      'fal.run', path, 'GET',
+      { 'Authorization': `Key ${process.env.FAL_KEY || ''}` },
+      null
+    );
+    res.status(result.status).json(JSON.parse(result.body));
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});

@@ -750,23 +750,68 @@ async function mkVideos(type) {
 
 async function sendHeyGen(prompt, key) {
   try {
-    const r=await fetch('/api/heygen',{
+    const r=await fetch('/api/fal',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({endpoint:'/v1/video_agent/generate',body:{prompt}})
+      body:JSON.stringify({
+        endpoint:'/fal-ai/kling-video/v2.1/standard/text-to-video',
+        body:{
+          prompt: prompt,
+          duration: '5',
+          aspect_ratio: '9:16'
+        }
+      })
     });
     const d=await r.json();
-    if(!r.ok)throw new Error(d.message||`HTTP ${r.status}`);
-    const vid=d.data?.video_id||d.video_id;
-    if(!vid)throw new Error('No video_id');
-    document.getElementById('st-'+key).textContent='Renderizando...';
-    await pollVid(vid,key);
+    if(!r.ok)throw new Error(d.message||d.detail||`HTTP ${r.status}`);
+    const reqId=d.request_id;
+    if(!reqId)throw new Error('No request_id de fal.ai');
+    document.getElementById('st-'+key).textContent='Kling está generando...';
+    await pollFal(reqId,'fal-ai/kling-video/v2.1/standard/text-to-video',key);
   }catch(e){
     document.querySelector(`#vs-${key} .sdot`).className='sdot err';
     document.getElementById('st-'+key).textContent='Error: '+e.message;
     document.getElementById('er-'+key).textContent='✗ '+e.message;
     document.getElementById('er-'+key).style.display='block';
   }
+}
+
+async function pollFal(reqId, endpoint, key){
+  return new Promise(resolve=>{
+    let att=0;
+    const iv=setInterval(async()=>{
+      att++;
+      if(att>90){clearInterval(iv);document.getElementById('st-'+key).textContent='Timeout - intenta de nuevo';resolve();return;}
+      try{
+        const r=await fetch('/api/fal-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:reqId,endpoint})});
+        const d=await r.json();
+        const st=d.status;
+        document.getElementById('st-'+key).textContent=
+          st==='IN_QUEUE'?`En cola... (${att*8}s)`:
+          st==='IN_PROGRESS'?`Generando... (${att*8}s)`:
+          st==='COMPLETED'?'✓ Listo':st||'Procesando...';
+        if(st==='COMPLETED'){
+          clearInterval(iv);
+          document.querySelector(`#vs-${key} .sdot`).className='sdot done';
+          const vu=d.output?.video?.url||d.video?.url||d.output?.[0]?.url;
+          if(vu){
+            const p=document.getElementById('vp-'+key);
+            p.src=vu;p.style.display='block';p.play().catch(()=>{});
+            const dl=document.getElementById('dl-'+key);
+            dl.href=vu;
+            dl.onclick=function(e){e.preventDefault();fetch(vu).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${key}.mp4`;a.click();}).catch(()=>window.open(vu,'_blank'));};
+            dl.style.display='flex';
+          }
+          resolve();
+        }else if(st==='FAILED'){
+          clearInterval(iv);
+          document.querySelector(`#vs-${key} .sdot`).className='sdot err';
+          document.getElementById('st-'+key).textContent='Error en Kling';
+          resolve();
+        }
+      }catch(e){}
+    },8000);
+  });
 }
 
 function pollVid(vid,key){
@@ -839,7 +884,7 @@ Responde SOLO con JSON sin markdown:
     const res=await fetch('/api/claude',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:sys,messages:[{role:'user',content}]})
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:6000,system:sys,messages:[{role:'user',content}]})
     });
     clearInterval(iv);
     if(!res.ok){const e=await res.json();throw new Error(e.error?.message||`HTTP ${res.status}`);}
@@ -888,19 +933,48 @@ async function mkMixVideos(){
 
 async function sendMixHeyGen(h){
   try{
-    const r=await fetch('/api/heygen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:'/v1/video_agent/generate',body:{prompt:h.heygen_prompt}})});
+    const r=await fetch('/api/fal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:'/fal-ai/kling-video/v2.1/standard/text-to-video',body:{prompt:h.heygen_prompt,duration:'10',aspect_ratio:'9:16'}})});
     const d=await r.json();
-    if(!r.ok)throw new Error(d.message||`HTTP ${r.status}`);
-    const vid=d.data?.video_id||d.video_id;
-    if(!vid)throw new Error('No video_id');
-    document.getElementById('mst-'+h.id).textContent='Renderizando...';
-    await pollMixVid(vid,h.id);
+    if(!r.ok)throw new Error(d.message||d.detail||`HTTP ${r.status}`);
+    const reqId=d.request_id;
+    if(!reqId)throw new Error('No request_id');
+    document.getElementById('mst-'+h.id).textContent='Kling generando...';
+    await pollMixFal(reqId,h.id);
   }catch(e){
     document.querySelector(`#mvs-${h.id} .sdot`).className='sdot err';
     document.getElementById('mst-'+h.id).textContent='Error: '+e.message;
     document.getElementById('mer-'+h.id).textContent='✗ '+e.message;
     document.getElementById('mer-'+h.id).style.display='block';
   }
+}
+
+async function pollMixFal(reqId,hid){
+  return new Promise(resolve=>{
+    let att=0;
+    const iv=setInterval(async()=>{
+      att++;
+      if(att>90){clearInterval(iv);resolve();return;}
+      try{
+        const r=await fetch('/api/fal-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:reqId,endpoint:'fal-ai/kling-video/v2.1/standard/text-to-video'})});
+        const d=await r.json();
+        const st=d.status;
+        document.getElementById('mst-'+hid).textContent=st==='IN_QUEUE'?`En cola... (${att*8}s)`:st==='IN_PROGRESS'?`Generando... (${att*8}s)`:st==='COMPLETED'?'✓ Listo':st||'Procesando...';
+        if(st==='COMPLETED'){
+          clearInterval(iv);
+          document.querySelector(`#mvs-${hid} .sdot`).className='sdot done';
+          const vu=d.output?.video?.url||d.video?.url||d.output?.[0]?.url;
+          if(vu){
+            const p=document.getElementById('mvp-'+hid);
+            p.src=vu;p.style.display='block';p.play().catch(()=>{});
+            const dl=document.getElementById('mdl-'+hid);
+            dl.href=vu;dl.onclick=function(e){e.preventDefault();fetch(vu).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`mix_${hid}.mp4`;a.click();}).catch(()=>window.open(vu,'_blank'));};
+            dl.style.display='flex';
+          }
+          resolve();
+        }else if(st==='FAILED'){clearInterval(iv);resolve();}
+      }catch(e){}
+    },8000);
+  });
 }
 
 function pollMixVid(vid,hid){
