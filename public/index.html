@@ -583,57 +583,70 @@ function rmVid(e, type) {
 // CLAUDE ANALYSIS
 // ═══════════════════════════════
 const SYSTEMS = {
-  hook: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Se te dan frames de los primeros 5 segundos del HOOK ganador de un video publicitario.
+  hook: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica con 20 años de experiencia. Se te dan frames de los primeros 5 segundos del HOOK ganador.
 
 PARTE 1 — DISECCIÓN FORENSE DEL HOOK:
-Analiza con precisión quirúrgica:
-• ¿Qué elemento visual aparece? ¿Qué problema o situación se muestra?
-• ¿Qué emoción VISCERAL despierta en el primer segundo? (asco, curiosidad extrema, dolor reconocible, urgencia)
-• ¿Cuál es el factor scroll-stopper? ¿Qué hace que el dedo se detenga?
-• ¿Close-up extremo, macro, plano general? ¿Hay movimiento?
-• ¿Qué textura, color o detalle lo hace irresistible?
+Analiza con ojo clínico:
+• ¿Qué aparece EXACTAMENTE? Describe cada detalle (objeto, parte del cuerpo, producto, situación)
+• ¿Qué emoción VISCERAL dispara en el primer segundo?
+• ¿Cuál es el factor scroll-stopper?
+• ¿Tipo de plano? ¿Hay movimiento o es estático?
+• ¿Texturas, colores, iluminación?
+• ¿Hay texto en pantalla?
+• ¿Hay audio? ¿Qué tipo?
 
-PARTE 2 — 5 VARIACIONES DEL HOOK (siempre 5 segundos):
-• Mantén la esencia visual que funcionó
-• Varía: ángulo de cámara, situación, iluminación
-• Audio creativo por variación: VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO
-
-Responde SOLO con JSON sin markdown:
-{"analysis":"3-4 oraciones del análisis forense","hooks":[{"id":1,"angle":"ángulo emocional","audio_type":"VOZ EN OFF","audio_content":"texto de voz o descripción de audio","why":"por qué mantiene la fórmula","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 5 SECOND VERTICAL HOOK AD:\\nVISUAL SCENE: [describe con extremo detalle qué aparece, ángulo, textura]\\nCAMERA: [tipo de plano exacto]\\nLIGHTING: [iluminación exacta]\\nMOVEMENT: [qué se mueve y cómo]\\nAUDIO: [voz en off diciendo 'X' / sonido ASMR de Y / música Z]\\nDURATION: Exactly 5 seconds\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K"}]}`,
-
-  body: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Se te dan frames del CUERPO del video ganador — la parte que desarrolla el problema y presenta la solución.
-
-PARTE 1 — DISECCIÓN DEL CUERPO GANADOR:
-• ¿Cómo desarrolla el problema del cliente?
-• ¿Cómo presenta la solución? ¿Muestra el producto en acción?
-• ¿Qué tipo de prueba social o demostración usa?
-• ¿Cuál es el ritmo y el tono emocional?
-• ¿Qué hace que la persona siga viendo después del hook?
-
-PARTE 2 — 5 VARIACIONES DEL CUERPO (5 segundos cada una):
-• Mantén la estructura narrativa que funcionó (problema→solución)
-• Varía: el ángulo del problema, la demostración del producto, el tono emocional
-• Audio creativo por variación: VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO
+PARTE 2 — 5 VARIACIONES DEL HOOK:
+REGLAS ABSOLUTAS PARA EL PROMPT DE HEYGEN:
+1. SIEMPRE exactamente 5 segundos — menciónalo múltiples veces
+2. SIEMPRE video vertical 9:16 — NUNCA imagen estática
+3. SIEMPRE audio — voz en off en español, ASMR o música. NUNCA silencio
+4. SIEMPRE movimiento visible en el video
+5. Prompt tan detallado que HeyGen no tenga que adivinar nada
 
 Responde SOLO con JSON sin markdown:
-{"analysis":"3-4 oraciones del análisis del cuerpo","hooks":[{"id":1,"angle":"ángulo narrativo","audio_type":"VOZ EN OFF","audio_content":"texto o descripción de audio","why":"por qué esta variación funciona","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 5 SECOND VERTICAL BODY AD:\\nVISUAL SCENE: [describe exactamente qué aparece, producto, demostración]\\nCAMERA: [ángulo exacto]\\nLIGHTING: [iluminación]\\nMOVEMENT: [movimientos específicos]\\nAUDIO: [audio exacto]\\nDURATION: Exactly 5 seconds\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K"}]}`,
+{"analysis":"3-4 oraciones del análisis forense exacto","hooks":[{"id":1,"angle":"ángulo emocional específico","audio_type":"VOZ EN OFF | ASMR | MÚSICA+TEXTO","audio_content":"si voz: texto exacto en español latino. si ASMR: sonido exacto. si música: género y mood","why":"por qué replica la fórmula ganadora","heygen_prompt":"THIS IS A 5-SECOND VERTICAL VIDEO AD — NOT AN IMAGE. DURATION: EXACTLY 5 SECONDS. FORMAT: VERTICAL 9:16 1080x1920px. OUTPUT MUST BE A VIDEO FILE WITH MOVEMENT AND AUDIO.\n\nVISUAL SCENE: [Describe con EXTREMO detalle qué aparece — texturas, colores, objetos, partes del cuerpo, estado visual exacto, iluminación]\n\nCAMERA: [extreme close-up macro / overhead / slow push-in / dutch angle]\n\nLIGHTING: [harsh clinical white / warm golden / dramatic single source]\n\nMOVEMENT (MANDATORY — THIS IS A VIDEO NOT A PHOTO): [Describe el movimiento continuo durante los 5 segundos: slow zoom / hand moving / liquid dripping / product rotating]\n\nAUDIO (MANDATORY — NEVER SILENT): [Voiceover in Latin American Spanish saying: \'texto exacto en español\' with urgent/soft/alarmed tone. OR ASMR sound of: exact sound description]\n\nDURATION: EXACTLY 5 SECONDS — NOT 2, NOT 3, EXACTLY 5\nOUTPUT FORMAT: MP4 video with audio track\nSTYLE: Hyper-realistic cinematic 4K commercial\nMOOD: [emoción que debe sentir el espectador]"}]}`,
 
-  cta: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica. Se te dan frames del CTA del video ganador — la parte final que genera la acción de compra.
+  body: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica con 20 años de experiencia. Se te dan frames del CUERPO del video ganador.
 
-PARTE 1 — DISECCIÓN DEL CTA GANADOR:
-• ¿Qué acción específica pide? (compra ahora, link en bio, desliza)
+PARTE 1 — DISECCIÓN DEL CUERPO:
+• ¿Cómo desarrolla el problema? ¿Muestra antes/después?
+• ¿Cómo presenta el producto en acción?
+• ¿Qué demostración visual usa?
+• ¿Tono emocional?
+• ¿Texto en pantalla?
+• ¿Tipo de audio?
+
+PARTE 2 — 5 VARIACIONES DEL CUERPO:
+REGLAS ABSOLUTAS:
+1. SIEMPRE exactamente 5 segundos
+2. SIEMPRE video vertical 9:16 — NUNCA imagen estática
+3. SIEMPRE audio en español
+4. SIEMPRE movimiento visible
+5. Mantén estructura problema→solución
+
+Responde SOLO con JSON sin markdown:
+{"analysis":"3-4 oraciones del análisis del cuerpo","hooks":[{"id":1,"angle":"ángulo narrativo","audio_type":"VOZ EN OFF | ASMR | MÚSICA+TEXTO","audio_content":"contenido exacto del audio en español","why":"por qué replica la fórmula del cuerpo","heygen_prompt":"THIS IS A 5-SECOND VERTICAL VIDEO AD — NOT AN IMAGE. DURATION: EXACTLY 5 SECONDS. FORMAT: VERTICAL 9:16 1080x1920px. MUST BE VIDEO WITH MOVEMENT AND AUDIO IN SPANISH.\n\nVISUAL SCENE: [Producto en acción, aplicación, resultado visible, demostración específica con detalle extremo]\nCAMERA: [ángulo exacto]\nLIGHTING: [iluminación exacta]\nMOVEMENT (MANDATORY): [movimiento continuo específico]\nAUDIO (MANDATORY IN SPANISH): [Voiceover saying: \'texto exacto en español\']\nDURATION: EXACTLY 5 SECONDS\nOUTPUT: MP4 VIDEO with Spanish audio track\nSTYLE: Hyper-realistic 4K commercial"}]}`,
+
+  cta: `Eres el mejor director creativo de publicidad para Meta Ads de Latinoamérica con 20 años de experiencia. Se te dan frames del CTA del video ganador.
+
+PARTE 1 — DISECCIÓN DEL CTA:
+• ¿Qué acción pide exactamente?
 • ¿Qué urgencia o escasez usa?
 • ¿Qué beneficio final promete?
-• ¿Cómo cierra emocionalmente? ¿Con dolor evitado o placer ganado?
-• ¿Por qué genera el clic?
+• ¿Texto en pantalla?
+• ¿Cómo cierra emocionalmente?
+• ¿Qué audio tiene?
 
-PARTE 2 — 5 VARIACIONES DEL CTA (5 segundos cada una):
-• Mantén el mecanismo de cierre que funcionó
-• Varía: el tipo de urgencia, el beneficio destacado, el tono
-• Audio creativo por variación: VOZ EN OFF / ASMR / MÚSICA+TEXTO / SILENCIO+TEXTO
+PARTE 2 — 5 VARIACIONES DEL CTA:
+REGLAS ABSOLUTAS:
+1. SIEMPRE exactamente 5 segundos
+2. SIEMPRE video vertical 9:16 — NUNCA imagen estática
+3. SIEMPRE audio en español con urgencia
+4. SIEMPRE movimiento visible
+5. CTA debe generar acción inmediata
 
 Responde SOLO con JSON sin markdown:
-{"analysis":"3-4 oraciones del análisis del CTA","hooks":[{"id":1,"angle":"ángulo de cierre","audio_type":"VOZ EN OFF","audio_content":"texto o descripción de audio","why":"por qué este CTA convierte","heygen_prompt":"MASTER PROMPT FOR HEYGEN — 5 SECOND VERTICAL CTA AD:\\nVISUAL SCENE: [describe exactamente qué aparece, producto, texto en pantalla]\\nCAMERA: [ángulo]\\nLIGHTING: [iluminación]\\nMOVEMENT: [movimiento]\\nAUDIO: [audio exacto]\\nDURATION: Exactly 5 seconds\\nFORMAT: Vertical 9:16 1080x1920\\nSTYLE: Hyper-realistic commercial 4K"}`
+{"analysis":"3-4 oraciones del análisis del CTA","hooks":[{"id":1,"angle":"ángulo de cierre","audio_type":"VOZ EN OFF | ASMR | MÚSICA+TEXTO","audio_content":"texto exacto del CTA en español","why":"por qué este CTA genera el clic","heygen_prompt":"THIS IS A 5-SECOND VERTICAL VIDEO AD — NOT AN IMAGE. DURATION: EXACTLY 5 SECONDS. FORMAT: VERTICAL 9:16 1080x1920px. MUST BE VIDEO WITH MOVEMENT AND URGENT SPANISH AUDIO.\n\nVISUAL SCENE: [Producto con resultado final, elemento de urgencia visual, texto CTA en pantalla]\nCAMERA: [ángulo]\nLIGHTING: [iluminación]\nMOVEMENT (MANDATORY): [movimiento específico]\nAUDIO (MANDATORY IN SPANISH): [Urgent voiceover saying: \'texto exacto del CTA\']\nON SCREEN TEXT: [texto exacto en pantalla]\nDURATION: EXACTLY 5 SECONDS\nOUTPUT: MP4 VIDEO with audio\nSTYLE: Hyper-realistic 4K commercial with urgency"}]}`
 };
 
 async function analyze(type, isR=false) {
@@ -750,24 +763,17 @@ async function mkVideos(type) {
 
 async function sendHeyGen(prompt, key) {
   try {
-    const r=await fetch('/api/fal',{
+    const r=await fetch('/api/heygen',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        endpoint:'/fal-ai/kling-video/v2.1/standard/text-to-video',
-        body:{
-          prompt: prompt,
-          duration: '5',
-          aspect_ratio: '9:16'
-        }
-      })
+      body:JSON.stringify({endpoint:'/v1/video_agent/generate',body:{prompt}})
     });
     const d=await r.json();
-    if(!r.ok)throw new Error(d.message||d.detail||`HTTP ${r.status}`);
-    const reqId=d.request_id;
-    if(!reqId)throw new Error('No request_id de fal.ai');
-    document.getElementById('st-'+key).textContent='Kling está generando...';
-    await pollFal(reqId,'fal-ai/kling-video/v2.1/standard/text-to-video',key);
+    if(!r.ok)throw new Error(d.message||`HTTP ${r.status}`);
+    const vid=d.data?.video_id||d.video_id;
+    if(!vid)throw new Error('No video_id');
+    document.getElementById('st-'+key).textContent='HeyGen generando...';
+    await pollVid(vid,key);
   }catch(e){
     document.querySelector(`#vs-${key} .sdot`).className='sdot err';
     document.getElementById('st-'+key).textContent='Error: '+e.message;
@@ -776,41 +782,35 @@ async function sendHeyGen(prompt, key) {
   }
 }
 
-async function pollFal(reqId, endpoint, key){
+async function pollVid(vid,key){
   return new Promise(resolve=>{
     let att=0;
     const iv=setInterval(async()=>{
       att++;
-      if(att>90){clearInterval(iv);document.getElementById('st-'+key).textContent='Timeout - intenta de nuevo';resolve();return;}
+      if(att>72){clearInterval(iv);document.getElementById('st-'+key).textContent='Ve a app.heygen.com/videos';resolve();return;}
       try{
-        const r=await fetch('/api/fal-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:reqId,endpoint})});
+        const r=await fetch('/api/heygen',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:`/v1/video_status.get?video_id=${vid}`,method:'GET'})});
         const d=await r.json();
-        const st=d.status;
-        document.getElementById('st-'+key).textContent=
-          st==='IN_QUEUE'?`En cola... (${att*8}s)`:
-          st==='IN_PROGRESS'?`Generando... (${att*8}s)`:
-          st==='COMPLETED'?'✓ Listo':st||'Procesando...';
-        if(st==='COMPLETED'){
+        const st=d.data?.status,vu=d.data?.video_url;
+        document.getElementById('st-'+key).textContent=st==='processing'?`Renderizando... (${att*10}s)`:st==='completed'?'✓ Listo':st||'Procesando...';
+        if(st==='completed'&&vu){
           clearInterval(iv);
           document.querySelector(`#vs-${key} .sdot`).className='sdot done';
-          const vu=d.output?.video?.url||d.video?.url||d.output?.[0]?.url;
-          if(vu){
-            const p=document.getElementById('vp-'+key);
-            p.src=vu;p.style.display='block';p.play().catch(()=>{});
-            const dl=document.getElementById('dl-'+key);
-            dl.href=vu;
-            dl.onclick=function(e){e.preventDefault();fetch(vu).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${key}.mp4`;a.click();}).catch(()=>window.open(vu,'_blank'));};
-            dl.style.display='flex';
-          }
+          const p=document.getElementById('vp-'+key);
+          p.src=vu;p.style.display='block';p.play().catch(()=>{});
+          const dl=document.getElementById('dl-'+key);
+          dl.href=vu;
+          dl.onclick=function(e){e.preventDefault();fetch(vu).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`video_${key}.mp4`;a.click();}).catch(()=>window.open(vu,'_blank'));};
+          dl.style.display='flex';
           resolve();
-        }else if(st==='FAILED'){
+        }else if(st==='failed'){
           clearInterval(iv);
           document.querySelector(`#vs-${key} .sdot`).className='sdot err';
-          document.getElementById('st-'+key).textContent='Error en Kling';
+          document.getElementById('st-'+key).textContent='Error en HeyGen';
           resolve();
         }
       }catch(e){}
-    },8000);
+    },10000);
   });
 }
 
