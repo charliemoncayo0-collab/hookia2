@@ -127,41 +127,34 @@ app.post('/api/merge-videos', async (req, res) => {
   try {
     const { hookBase64, winnerBase64, hookDuration = 5 } = req.body;
     
+    const ts = Date.now();
     const tmpDir = os.tmpdir();
-    const hookFile = path.join(tmpDir, `hook_${Date.now()}.mp4`);
-    const winnerFile = path.join(tmpDir, `winner_${Date.now()}.mp4`);
-    const outputFile = path.join(tmpDir, `merged_${Date.now()}.mp4`);
-    const trimmedWinner = path.join(tmpDir, `trimmed_${Date.now()}.mp4`);
+    const hookFile = path.join(tmpDir, `hook_${ts}.mp4`);
+    const winnerFile = path.join(tmpDir, `winner_${ts}.mp4`);
+    const trimmedHook = path.join(tmpDir, `trimhook_${ts}.mp4`);
+    const trimmedWinner = path.join(tmpDir, `trimwinner_${ts}.mp4`);
+    const outputFile = path.join(tmpDir, `merged_${ts}.mp4`);
+    const listFile = path.join(tmpDir, `list_${ts}.txt`);
 
-    // Write files
     fs.writeFileSync(hookFile, Buffer.from(hookBase64, 'base64'));
     fs.writeFileSync(winnerFile, Buffer.from(winnerBase64, 'base64'));
 
-    // Get winner duration
-    const duration = execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${winnerFile}"`).toString().trim();
-    const winnerDuration = parseFloat(duration);
-    
-    // Trim hook to hookDuration seconds
-    const trimmedHook = path.join(tmpDir, `trimhook_${Date.now()}.mp4`);
-    execSync(`"${ffmpegPath}" -i "${hookFile}" -t ${hookDuration} -c:v libx264 -c:a aac "${trimmedHook}" -y`);
-    
-    // Trim winner removing first hookDuration seconds
-    execSync(`"${ffmpegPath}" -i "${winnerFile}" -ss ${hookDuration} -c:v libx264 -c:a aac "${trimmedWinner}" -y`);
-    
-    // Create concat list
-    const listFile = path.join(tmpDir, `list_${Date.now()}.txt`);
+    // Normalize hook: trim to hookDuration, force vertical 1080x1920, 30fps, aac
+    execSync(`"${ffmpegPath}" -i "${hookFile}" -t ${hookDuration} -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30" -c:v libx264 -preset fast -crf 23 -c:a aac -ar 44100 -ac 2 "${trimmedHook}" -y`, {timeout: 120000});
+
+    // Normalize winner body: skip first hookDuration seconds, same format
+    execSync(`"${ffmpegPath}" -ss ${hookDuration} -i "${winnerFile}" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30" -c:v libx264 -preset fast -crf 23 -c:a aac -ar 44100 -ac 2 "${trimmedWinner}" -y`, {timeout: 120000});
+
+    // Concat both normalized videos
     fs.writeFileSync(listFile, `file '${trimmedHook}'\nfile '${trimmedWinner}'`);
-    
-    // Concatenate
-    execSync(`"${ffmpegPath}" -f concat -safe 0 -i "${listFile}" -c copy "${outputFile}" -y`);
-    
+    execSync(`"${ffmpegPath}" -f concat -safe 0 -i "${listFile}" -c:v libx264 -c:a aac "${outputFile}" -y`, {timeout: 120000});
+
     const merged = fs.readFileSync(outputFile);
-    
-    // Cleanup
-    [hookFile, winnerFile, outputFile, trimmedWinner, trimmedHook, listFile].forEach(f => {
+
+    [hookFile, winnerFile, trimmedHook, trimmedWinner, outputFile, listFile].forEach(f => {
       try { fs.unlinkSync(f); } catch(e) {}
     });
-    
+
     res.json({ video: merged.toString('base64') });
   } catch(e) { 
     res.status(500).json({ error: e.message }); 
