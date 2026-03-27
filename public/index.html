@@ -542,8 +542,8 @@ let mixHooks = [];
 let activeSection = 'hook';
 
 function switchModule(m) {
-  document.querySelectorAll('.mtab').forEach((t,i)=>t.classList.toggle('active',(m==='analyzer'&&i===0)||(m==='mixer'&&i===1)));
-  document.querySelectorAll('.module').forEach((mod,i)=>mod.classList.toggle('active',(m==='analyzer'&&i===0)||(m==='mixer'&&i===1)));
+  document.querySelectorAll('.mtab').forEach((t,i)=>t.classList.toggle('active',(m==='analyzer'&&i===0)||(m==='mixer'&&i===1)||(m==='finder'&&i===2)));
+  document.querySelectorAll('.module').forEach((mod,i)=>mod.classList.toggle('active',(m==='analyzer'&&i===0)||(m==='mixer'&&i===1)||(m==='finder'&&i===2)));
 }
 
 function setSection(s) {
