@@ -265,6 +265,7 @@ video{width:100%;border-radius:8px;background:#000;display:none;max-height:300px
   <div class="module-tabs">
     <div class="mtab active" onclick="switchModule('analyzer')">🎬 Analizador de video ganador</div>
     <div class="mtab" onclick="switchModule('mixer')">🔀 Mezclador de partes</div>
+    <div class="mtab" onclick="switchModule('finder')">🌐 Buscador de hooks virales</div>
   </div>
 
   <!-- MODULE 1: ANALYZER -->
@@ -405,6 +406,51 @@ video{width:100%;border-radius:8px;background:#000;display:none;max-height:300px
   </div>
 
 </div>
+</div>
+
+  <!-- MODULE 3: FINDER -->
+  <div class="module" id="module-finder">
+    <div class="card">
+      <div class="ctitle">Buscar hooks virales y reemplazar</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7;">
+        Pega la URL del producto y sube tu video ganador. La app busca los mejores anuncios en español de Meta Ad Library, descarga los 10 mejores hooks y los une con el cuerpo de tu video ganador.
+      </div>
+
+      <div class="frow"><span>🔗</span><input type="url" id="finder-url" placeholder="URL del producto"></div>
+
+      <div class="dlabel" style="margin-bottom:10px;">Video ganador (se conserva el cuerpo + CTA, se reemplaza el hook)</div>
+      <div class="vzone hook-z" id="vup-finder" style="margin-bottom:16px;">
+        <input type="file" accept="video/*" onchange="handleFinderVid(event)">
+        <div id="vph-finder"><span class="zi">🎬</span><h4>Sube tu video ganador</h4><p>Se eliminan los primeros 5 segundos y se reemplazan</p></div>
+        <div id="vpw-finder" style="display:none;padding:10px;font-size:12px;color:var(--green);">✓ Video cargado</div>
+      </div>
+
+      <div class="dlabel">Segundos del hook a reemplazar</div>
+      <div class="drow" style="margin-bottom:20px;">
+        <div class="dbtn" onclick="setFinderDur(3)" id="fd3">3 seg</div>
+        <div class="dbtn sel" onclick="setFinderDur(5)" id="fd5">5 seg</div>
+        <div class="dbtn" onclick="setFinderDur(7)" id="fd7">7 seg</div>
+      </div>
+
+      <button class="btn-analyze hook-a" id="gbtn-finder" onclick="findAds()">🌐 Buscar hooks virales en Meta Ads</button>
+    </div>
+
+    <div class="loading" id="ld-finder"><div class="lring" style="border-top-color:#f7c948"></div><div class="ltext" id="lt-finder">Buscando anuncios virales en español...</div></div>
+
+    <div class="hooks-wrap" id="hw-finder">
+      <div class="sh"><h2>Hooks encontrados</h2><button class="btn-regen" onclick="findAds()">↻ Buscar de nuevo</button></div>
+      <div class="hlist" id="hl-finder"></div>
+    </div>
+
+    <div class="vwrap" id="vw-finder">
+      <div class="vcard">
+        <div class="vhead"><h3>Generar 10 videos</h3><p>Reemplaza el hook de tu video ganador con cada hook encontrado</p></div>
+        <div class="vactions"><button class="btn-vid hook-v" id="vbtn-finder" onclick="mergeAll()"><span>▶</span> Generar los 10 videos</button></div>
+        <div class="player-wrap" id="pw-finder"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -1001,6 +1047,234 @@ function pollMixVid(vid,hid){
       }catch(e){}
     },10000);
   });
+}
+
+// ═══════════════════════════════
+// FINDER MODULE
+// ═══════════════════════════════
+let finderVidB64 = null;
+let finderDur = 5;
+let foundAds = [];
+
+function setFinderDur(d) {
+  finderDur = d;
+  [3,5,7].forEach(n => {
+    document.getElementById('fd'+n).classList.toggle('sel', n===d);
+  });
+}
+
+function handleFinderVid(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    finderVidB64 = ev.target.result.split(',')[1];
+    document.getElementById('vph-finder').style.display = 'none';
+    document.getElementById('vpw-finder').style.display = 'block';
+    document.getElementById('vpw-finder').textContent = '✓ ' + f.name;
+  };
+  reader.readAsDataURL(f);
+}
+
+async function findAds() {
+  const url = document.getElementById('finder-url').value.trim();
+  if(!url) { alert('Pega la URL del producto'); return; }
+  if(!finderVidB64) { alert('Sube tu video ganador'); return; }
+
+  document.getElementById('gbtn-finder').disabled = true;
+  document.getElementById('hw-finder').classList.remove('show');
+  document.getElementById('vw-finder').classList.remove('show');
+  document.getElementById('ld-finder').classList.add('show');
+
+  const msgs = ['Buscando anuncios virales en español...','Claude extrae palabras clave del producto...','Consultando Meta Ad Library...','Filtrando los mejores hooks...'];
+  let mi = 0;
+  const iv = setInterval(() => {
+    mi = (mi+1) % msgs.length;
+    document.getElementById('lt-finder').textContent = msgs[mi];
+  }, 2000);
+
+  try {
+    // Step 1: Claude extracts keywords from URL
+    const kwRes = await fetch('/api/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{role: 'user', content: `URL del producto: ${url}
+
+Extrae 3 palabras clave en español para buscar este producto en Meta Ad Library. Responde SOLO con JSON: {"keywords": "palabra1 palabra2 palabra3", "product_name": "nombre del producto"}`}]
+      })
+    });
+    const kwData = await kwRes.json();
+    const kwParsed = JSON.parse(kwData.content[0].text.replace(/\`\`\`json|\`\`\`/g,'').trim());
+    const keywords = kwParsed.keywords;
+    const productName = kwParsed.product_name;
+
+    // Step 2: Search Meta Ad Library
+    const metaRes = await fetch('/api/meta-ads', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ keywords, countries: ['MX','CO','AR','ES','PE','VE','CL','EC','GT','BO'] })
+    });
+    const metaData = await metaRes.json();
+
+    clearInterval(iv);
+    document.getElementById('ld-finder').classList.remove('show');
+    document.getElementById('gbtn-finder').disabled = false;
+
+    if (!metaData.data || metaData.data.length === 0) {
+      alert('No se encontraron anuncios de video para este producto. Intenta con otras palabras clave.');
+      return;
+    }
+
+    foundAds = metaData.data.slice(0, 10);
+    renderFoundAds(productName);
+
+  } catch(e) {
+    clearInterval(iv);
+    document.getElementById('ld-finder').classList.remove('show');
+    document.getElementById('gbtn-finder').disabled = false;
+    alert('Error: ' + e.message);
+  }
+}
+
+function renderFoundAds(productName) {
+  const l = document.getElementById('hl-finder');
+  l.innerHTML = '';
+  foundAds.forEach((ad, i) => {
+    const div = document.createElement('div');
+    div.className = 'hcard hook-c sel';
+    div.id = 'fad-' + i;
+    div.onclick = () => document.getElementById('fad-'+i).classList.toggle('sel');
+    const title = ad.ad_creative_link_titles?.[0] || ad.page_name || `Anuncio ${i+1}`;
+    const desc = ad.ad_creative_bodies?.[0] || 'Sin descripción';
+    div.innerHTML = `
+      <div class="hcheck">✓</div>
+      <div class="hidx">${String(i+1).padStart(2,'0')}</div>
+      <div class="hbody">
+        <div class="hangle">${ad.page_name || 'Anunciante'}</div>
+        <div class="hscript">${title}</div>
+        <div class="hwhy">${desc.substring(0,100)}${desc.length>100?'...':''}</div>
+        <a href="${ad.ad_snapshot_url}" target="_blank" style="font-size:10px;color:var(--accent);margin-top:4px;display:inline-block;">Ver anuncio →</a>
+      </div>`;
+    l.appendChild(div);
+  });
+  document.getElementById('hw-finder').classList.add('show');
+  document.getElementById('vw-finder').classList.add('show');
+  document.getElementById('pw-finder').innerHTML = '';
+}
+
+async function mergeAll() {
+  const selected = foundAds.filter((ad, i) => document.getElementById('fad-'+i)?.classList.contains('sel'));
+  if(!selected.length) { alert('Selecciona al menos un anuncio'); return; }
+  if(!finderVidB64) { alert('Necesitas el video ganador'); return; }
+
+  document.getElementById('vbtn-finder').disabled = true;
+  document.getElementById('vbtn-finder').innerHTML = '<div class="sp"></div> Procesando videos...';
+
+  const pw = document.getElementById('pw-finder');
+  pw.innerHTML = '';
+
+  selected.forEach((ad, i) => {
+    const div = document.createElement('div');
+    div.className = 'vitem';
+    div.id = 'fvi-' + i;
+    const title = ad.ad_creative_link_titles?.[0] || ad.page_name || `Anuncio ${i+1}`;
+    div.innerHTML = `
+      <div class="vitem-angle">${ad.page_name || 'Anunciante'}</div>
+      <div class="vitem-script">${title}</div>
+      <div class="vstatus" id="fvs-${i}"><div class="sdot proc"></div><span id="fst-${i}">Descargando hook...</span></div>
+      <video id="fvp-${i}" controls></video>
+      <a id="fdl-${i}" class="btn-dl" download="hook_merged_${i+1}.mp4">↓ Descargar video ${i+1}</a>
+      <div class="errmsg" id="fer-${i}"></div>`;
+    pw.appendChild(div);
+  });
+
+  document.getElementById('vw-finder').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  // Process sequentially to avoid overload
+  for(let i=0; i<selected.length; i++) {
+    await processAdMerge(selected[i], i);
+  }
+
+  document.getElementById('vbtn-finder').disabled = false;
+  document.getElementById('vbtn-finder').innerHTML = '<span>▶</span> Regenerar';
+}
+
+async function processAdMerge(ad, idx) {
+  try {
+    document.getElementById('fst-'+idx).textContent = 'Descargando hook del anuncio...';
+
+    // Download the ad video via proxy
+    const dlRes = await fetch('/api/download-video', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ url: ad.ad_snapshot_url })
+    });
+
+    if(!dlRes.ok) throw new Error('No se pudo descargar el anuncio');
+
+    const blob = await dlRes.blob();
+    const hookB64 = await blobToB64(blob);
+
+    document.getElementById('fst-'+idx).textContent = 'Uniendo con tu video ganador...';
+
+    // Merge via server
+    const mergeRes = await fetch('/api/merge-videos', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        hookBase64: hookB64,
+        winnerBase64: finderVidB64,
+        hookDuration: finderDur
+      })
+    });
+
+    const mergeData = await mergeRes.json();
+    if(!mergeRes.ok || !mergeData.video) throw new Error(mergeData.error || 'Error al unir videos');
+
+    document.querySelector('#fvs-'+idx+' .sdot').className = 'sdot done';
+    document.getElementById('fst-'+idx).textContent = '✓ Listo';
+
+    const videoBlob = b64ToBlob(mergeData.video, 'video/mp4');
+    const videoUrl = URL.createObjectURL(videoBlob);
+
+    const p = document.getElementById('fvp-'+idx);
+    p.src = videoUrl; p.style.display = 'block'; p.play().catch(()=>{});
+
+    const dl = document.getElementById('fdl-'+idx);
+    dl.href = videoUrl;
+    dl.onclick = function(e) {
+      e.preventDefault();
+      const a = document.createElement('a');
+      a.href = videoUrl;
+      a.download = `hook_merged_${idx+1}.mp4`;
+      a.click();
+    };
+    dl.style.display = 'flex';
+
+  } catch(e) {
+    document.querySelector('#fvs-'+idx+' .sdot').className = 'sdot err';
+    document.getElementById('fst-'+idx).textContent = 'Error: ' + e.message;
+    document.getElementById('fer-'+idx).textContent = '✗ ' + e.message;
+    document.getElementById('fer-'+idx).style.display = 'block';
+  }
+}
+
+function blobToB64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function b64ToBlob(b64, type) {
+  const binary = atob(b64);
+  const arr = new Uint8Array(binary.length);
+  for(let i=0; i<binary.length; i++) arr[i] = binary.charCodeAt(i);
+  return new Blob([arr], { type });
 }
 
 function resetAll(){
