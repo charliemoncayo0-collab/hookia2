@@ -1093,22 +1093,10 @@ async function findAds() {
   }, 2000);
 
   try {
-    // Step 1: Claude extracts keywords from URL
-    const kwRes = await fetch('/api/claude', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
-        messages: [{role: 'user', content: `URL del producto: ${url}
-
-Extrae 3 palabras clave en español para buscar este producto en Meta Ad Library. Responde SOLO con JSON: {"keywords": "palabra1 palabra2 palabra3", "product_name": "nombre del producto"}`}]
-      })
-    });
-    const kwData = await kwRes.json();
-    const kwParsed = JSON.parse(kwData.content[0].text.replace(/\`\`\`json|\`\`\`/g,'').trim());
-    const keywords = kwParsed.keywords;
-    const productName = kwParsed.product_name;
+    // Step 1: Extract keywords from URL
+    const slug = url.split('/').filter(Boolean).pop() || '';
+    const keywords = decodeURIComponent(slug.replace(/[-_]/g, ' ')).substring(0, 60);
+    const productName = keywords || 'producto';
 
     // Step 2: Search Meta Ad Library
     const metaRes = await fetch('/api/meta-ads', {
