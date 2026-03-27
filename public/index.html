@@ -1095,14 +1095,14 @@ async function findAds() {
   try {
     // Step 1: Extract keywords from URL
     const slug = url.split('/').filter(Boolean).pop() || '';
-    const keywords = decodeURIComponent(slug.replace(/[-_]/g, ' ')).substring(0, 60);
+    const keywords = decodeURIComponent(slug.replace(/[-_]/g, ' ')).substring(0, 50);
     const productName = keywords || 'producto';
 
-    // Step 2: Search Meta Ad Library
+    // Step 2: Search TikTok videos via Google
     const metaRes = await fetch('/api/meta-ads', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ keywords, countries: ['MX','CO','AR','ES','PE','VE','CL','EC','GT','BO'] })
+      body: JSON.stringify({ keywords })
     });
     const metaData = await metaRes.json();
 
@@ -1134,16 +1134,16 @@ function renderFoundAds(productName) {
     div.className = 'hcard hook-c sel';
     div.id = 'fad-' + i;
     div.onclick = () => document.getElementById('fad-'+i).classList.toggle('sel');
-    const title = ad.ad_creative_link_titles?.[0] || ad.page_name || `Anuncio ${i+1}`;
-    const desc = ad.ad_creative_bodies?.[0] || 'Sin descripción';
+    const title = ad.ad_creative_link_titles?.[0] || ad.page_name || `Video ${i+1}`;
+    const desc = ad.ad_creative_bodies?.[0] || '';
     div.innerHTML = `
       <div class="hcheck">✓</div>
       <div class="hidx">${String(i+1).padStart(2,'0')}</div>
       <div class="hbody">
-        <div class="hangle">${ad.page_name || 'Anunciante'}</div>
-        <div class="hscript">${title}</div>
+        <div class="hangle">TikTok · ${ad.page_name || ''}</div>
+        <div class="hscript">${title.substring(0,80)}</div>
         <div class="hwhy">${desc.substring(0,100)}${desc.length>100?'...':''}</div>
-        <a href="${ad.ad_snapshot_url}" target="_blank" style="font-size:10px;color:var(--accent);margin-top:4px;display:inline-block;">Ver anuncio →</a>
+        <a href="${ad.ad_snapshot_url || ad.video_url}" target="_blank" style="font-size:10px;color:var(--accent);margin-top:4px;display:inline-block;">Ver video en TikTok →</a>
       </div>`;
     l.appendChild(div);
   });
@@ -1194,10 +1194,11 @@ async function processAdMerge(ad, idx) {
     document.getElementById('fst-'+idx).textContent = 'Descargando hook del anuncio...';
 
     // Download the ad video via proxy
+    const videoUrl = ad.video_url || ad.ad_snapshot_url;
     const dlRes = await fetch('/api/download-video', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ url: ad.ad_snapshot_url })
+      body: JSON.stringify({ url: videoUrl })
     });
 
     if(!dlRes.ok) throw new Error('No se pudo descargar el anuncio');

@@ -72,17 +72,29 @@ app.post('/api/fal-status', async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-// Meta Ad Library search
+// Google Custom Search for TikTok videos
 app.post('/api/meta-ads', async (req, res) => {
   try {
-    const { keywords, countries } = req.body;
-    const token = META_TOKEN;
-    const countriesParam = (countries || ['MX','CO','AR','ES','PE','VE','CL','EC','GT','BO']).join(',');
-    const searchTerms = encodeURIComponent(keywords);
-    const path = `/v19.0/ads_archive?access_token=${token}&search_terms=${searchTerms}&ad_reached_countries=[${countriesParam.split(',').map(c=>`"${c}"`).join(',')}]&ad_type=ALL&media_type=VIDEO&fields=id,ad_creative_bodies,ad_creative_link_captions,ad_creative_link_descriptions,ad_creative_link_titles,ad_delivery_start_time,ad_snapshot_url,page_name,impressions,spend&limit=20&ad_active_status=ALL`;
+    const { keywords } = req.body;
+    const GOOGLE_KEY = process.env.GOOGLE_API_KEY || '';
+    const CSE_ID = process.env.GOOGLE_CSE_ID || '';
+    const query = encodeURIComponent(keywords + ' site:tiktok.com');
+    const path = `/customsearch/v1?key=${GOOGLE_KEY}&cx=${CSE_ID}&q=${query}&num=10&searchType=video`;
     
-    const result = await makeRequest('graph.facebook.com', path, 'GET', {}, null);
-    res.status(result.status).json(JSON.parse(result.body));
+    const result = await makeRequest('www.googleapis.com', path, 'GET', {}, null);
+    const data = JSON.parse(result.body);
+    
+    // Transform Google results to match our expected format
+    const items = (data.items || []).map((item, i) => ({
+      id: i,
+      page_name: item.displayLink || 'TikTok',
+      ad_creative_link_titles: [item.title],
+      ad_creative_bodies: [item.snippet],
+      ad_snapshot_url: item.link,
+      video_url: item.link
+    }));
+    
+    res.json({ data: items });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
