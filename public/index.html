@@ -1194,11 +1194,11 @@ async function processAdMerge(ad, idx) {
     document.getElementById('fst-'+idx).textContent = 'Descargando hook del anuncio...';
 
     // Download the ad video via proxy
-    const videoUrl = ad.video_url || ad.ad_snapshot_url;
+    const adVideoUrl = ad.video_url || ad.ad_snapshot_url;
     const dlRes = await fetch('/api/download-video', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ url: videoUrl })
+      body: JSON.stringify({ url: adVideoUrl })
     });
 
     if(!dlRes.ok) throw new Error('No se pudo descargar el anuncio');
