@@ -136,18 +136,22 @@ app.post('/api/merge-videos', async (req, res) => {
     const outputFile = path.join(tmpDir, `merged_${ts}.mp4`);
     const listFile = path.join(tmpDir, `list_${ts}.txt`);
 
+    // Write files
     fs.writeFileSync(hookFile, Buffer.from(hookBase64, 'base64'));
     fs.writeFileSync(winnerFile, Buffer.from(winnerBase64, 'base64'));
 
-    // Normalize hook: trim to hookDuration, force vertical 1080x1920, 30fps, aac
-    execSync(`"${ffmpegPath}" -i "${hookFile}" -t ${hookDuration} -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30" -c:v libx264 -preset fast -crf 23 -c:a aac -ar 44100 -ac 2 "${trimmedHook}" -y`, {timeout: 120000});
+    // Normalize hook to small format for low memory
+    execSync(`"${ffmpegPath}" -i "${hookFile}" -t ${hookDuration} -vf "scale=480:854:force_original_aspect_ratio=decrease,pad=480:854:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=24" -c:v libx264 -preset ultrafast -crf 30 -c:a aac -ar 44100 -ac 1 "${trimmedHook}" -y`, {timeout: 180000});
+    fs.unlinkSync(hookFile);
 
-    // Normalize winner body: skip first hookDuration seconds, same format
-    execSync(`"${ffmpegPath}" -ss ${hookDuration} -i "${winnerFile}" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30" -c:v libx264 -preset fast -crf 23 -c:a aac -ar 44100 -ac 2 "${trimmedWinner}" -y`, {timeout: 120000});
+    // Normalize winner body
+    execSync(`"${ffmpegPath}" -ss ${hookDuration} -i "${winnerFile}" -vf "scale=480:854:force_original_aspect_ratio=decrease,pad=480:854:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=24" -c:v libx264 -preset ultrafast -crf 30 -c:a aac -ar 44100 -ac 1 "${trimmedWinner}" -y`, {timeout: 180000});
+    fs.unlinkSync(winnerFile);
 
-    // Concat both normalized videos
+    // Concat
     fs.writeFileSync(listFile, `file '${trimmedHook}'\nfile '${trimmedWinner}'`);
-    execSync(`"${ffmpegPath}" -f concat -safe 0 -i "${listFile}" -c:v libx264 -c:a aac "${outputFile}" -y`, {timeout: 120000});
+    execSync(`"${ffmpegPath}" -f concat -safe 0 -i "${listFile}" -c copy "${outputFile}" -y`, {timeout: 60000});
+    fs.unlinkSync(trimmedHook); fs.unlinkSync(trimmedWinner); fs.unlinkSync(listFile);
 
     const merged = fs.readFileSync(outputFile);
 
@@ -157,6 +161,7 @@ app.post('/api/merge-videos', async (req, res) => {
 
     res.json({ video: merged.toString('base64') });
   } catch(e) { 
+    console.error('Merge error:', e.message);
     res.status(500).json({ error: e.message }); 
   }
 });
